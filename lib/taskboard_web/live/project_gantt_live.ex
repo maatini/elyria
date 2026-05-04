@@ -144,57 +144,62 @@ defmodule TaskboardWeb.ProjectGanttLive do
 
   defp to_gantt_tasks(tasks) do
     today = Date.utc_today()
+    Enum.flat_map(tasks, &task_to_gantt(&1, today))
+  end
 
-    Enum.flat_map(tasks, fn task ->
-      start = task.start_date || today
-      end_d = task.end_date || Date.add(start, 1)
+  defp task_to_gantt(task, today) do
+    start = task.start_date || today
+    end_d = task.end_date || Date.add(start, 1)
 
-      if start == end_d do
-        []
-      else
-        deps =
-          task.incoming_dependencies
-          |> Enum.map(& &1.predecessor_id)
-          |> Enum.join(",")
+    if start == end_d do
+      []
+    else
+      [build_gantt_entry(task, start, end_d)]
+    end
+  end
 
-        label =
-          if task.chapter_number,
-            do: "#{task.chapter_number} #{task.title}",
-            else: task.title
+  defp build_gantt_entry(task, start, end_d) do
+    %{
+      id: task.id,
+      name: task_label(task),
+      start: Date.to_iso8601(start),
+      end: Date.to_iso8601(end_d),
+      progress: if(task.status in [:done, :skipped], do: 100, else: 0),
+      dependencies: task_deps(task),
+      custom_class: task_custom_class(task),
+      custom_popup: task_subtitle(task)
+    }
+  end
 
-        group_name = task.assigned_group && task.assigned_group.name
+  defp task_label(task) do
+    if task.chapter_number,
+      do: "#{task.chapter_number} #{task.title}",
+      else: task.title
+  end
 
-        subtitle =
-          [
-            group_name && "Gruppe: #{group_name}",
-            "Status: #{status_de(task.status)}",
-            task.start_date && "Start: #{Calendar.strftime(task.start_date, "%d.%m.%Y")}",
-            task.end_date && "Ende: #{Calendar.strftime(task.end_date, "%d.%m.%Y")}"
-          ]
-          |> Enum.filter(& &1)
-          |> Enum.join(" · ")
+  defp task_deps(task) do
+    Enum.map_join(task.incoming_dependencies, ",", & &1.predecessor_id)
+  end
 
-        custom_class =
-          cond do
-            task.overdue? == true -> "gantt-overdue"
-            task.warning? == true -> "gantt-warning"
-            true -> "gantt-#{task.status}"
-          end
+  defp task_custom_class(task) do
+    cond do
+      task.overdue? == true -> "gantt-overdue"
+      task.warning? == true -> "gantt-warning"
+      true -> "gantt-#{task.status}"
+    end
+  end
 
-        [
-          %{
-            id: task.id,
-            name: label,
-            start: Date.to_iso8601(start),
-            end: Date.to_iso8601(end_d),
-            progress: if(task.status in [:done, :skipped], do: 100, else: 0),
-            dependencies: deps,
-            custom_class: custom_class,
-            custom_popup: subtitle
-          }
-        ]
-      end
-    end)
+  defp task_subtitle(task) do
+    group_name = task.assigned_group && task.assigned_group.name
+
+    [
+      group_name && "Gruppe: #{group_name}",
+      "Status: #{status_de(task.status)}",
+      task.start_date && "Start: #{Calendar.strftime(task.start_date, "%d.%m.%Y")}",
+      task.end_date && "Ende: #{Calendar.strftime(task.end_date, "%d.%m.%Y")}"
+    ]
+    |> Enum.filter(& &1)
+    |> Enum.join(" · ")
   end
 
   defp status_de(:open), do: "Offen"

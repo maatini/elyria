@@ -1,4 +1,5 @@
 defmodule Taskboard.Accounts.Group do
+  @moduledoc false
   use Ash.Resource,
     domain: Taskboard.Accounts,
     data_layer: AshPostgres.DataLayer

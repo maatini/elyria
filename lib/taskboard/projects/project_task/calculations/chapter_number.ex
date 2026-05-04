@@ -1,4 +1,5 @@
 defmodule Taskboard.Projects.ProjectTask.Calculations.ChapterNumber do
+  @moduledoc false
   use Ash.Resource.Calculation
 
   @impl true

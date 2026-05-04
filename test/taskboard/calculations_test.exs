@@ -1,8 +1,7 @@
 defmodule Taskboard.CalculationsTest do
   use ExUnit.Case, async: true
 
-  alias Taskboard.Projects.ProjectTask.Calculations.{Overdue, Warning}
-  alias Taskboard.Projects.ProjectTask.Calculations.ChapterNumber
+  alias Taskboard.Projects.ProjectTask.Calculations.{ChapterNumber, Overdue, Warning}
 
   describe "Overdue.calculate/3" do
     test "true for open task with past end_date" do

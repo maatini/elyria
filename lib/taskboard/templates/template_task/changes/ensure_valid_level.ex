@@ -1,4 +1,5 @@
 defmodule Taskboard.Templates.TemplateTask.Changes.EnsureValidLevel do
+  @moduledoc false
   use Ash.Resource.Change
 
   @impl true

@@ -1,4 +1,5 @@
 defmodule Taskboard.Projects.Project.Changes.Activate do
+  @moduledoc false
   use Ash.Resource.Change
   require Ash.Query
 
@@ -22,17 +23,19 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
         |> Ash.Changeset.force_change_attribute(:context_id, context_id)
         |> Ash.Changeset.force_change_attribute(:project_type_id, project_type_id)
         |> Ash.Changeset.force_change_attribute(:activated_at, DateTime.utc_now())
-        |> Ash.Changeset.after_action(fn _cs, project ->
-          with {:ok, {tasks, deps}} <- load_template_data(template_id) do
-            create_tasks_and_deps(project, tasks, deps, reference_date)
-          end
-        end)
+        |> Ash.Changeset.after_action(&after_activate(&1, &2, template_id, reference_date))
 
       {:error, _} ->
         Ash.Changeset.add_error(changeset,
           field: :template_id,
           message: "Template nicht gefunden"
         )
+    end
+  end
+
+  defp after_activate(_changeset, project, template_id, reference_date) do
+    with {:ok, {tasks, deps}} <- load_template_data(template_id) do
+      create_tasks_and_deps(project, tasks, deps, reference_date)
     end
   end
 

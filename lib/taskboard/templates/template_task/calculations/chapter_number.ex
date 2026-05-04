@@ -1,4 +1,5 @@
 defmodule Taskboard.Templates.TemplateTask.Calculations.ChapterNumber do
+  @moduledoc false
   use Ash.Resource.Calculation
 
   @impl true

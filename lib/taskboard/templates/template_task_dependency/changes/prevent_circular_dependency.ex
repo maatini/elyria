@@ -1,4 +1,5 @@
 defmodule Taskboard.Templates.TemplateTaskDependency.Changes.PreventCircularDependency do
+  @moduledoc false
   use Ash.Resource.Change
 
   @impl true

@@ -1,4 +1,5 @@
 defmodule Taskboard.Projects.ProjectType do
+  @moduledoc false
   use Ash.Resource,
     domain: Taskboard.Projects,
     data_layer: AshPostgres.DataLayer

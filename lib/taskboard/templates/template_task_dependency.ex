@@ -1,4 +1,5 @@
 defmodule Taskboard.Templates.TemplateTaskDependency do
+  @moduledoc false
   use Ash.Resource,
     domain: Taskboard.Templates,
     data_layer: AshPostgres.DataLayer

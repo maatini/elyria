@@ -1,4 +1,5 @@
 defmodule Taskboard.Projects do
+  @moduledoc false
   use Ash.Domain,
     extensions: [AshAdmin.Domain]
 

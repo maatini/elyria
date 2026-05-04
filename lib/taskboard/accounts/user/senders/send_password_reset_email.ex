@@ -1,4 +1,5 @@
 defmodule Taskboard.Accounts.User.Senders.SendPasswordResetEmail do
+  @moduledoc false
   use AshAuthentication.Sender
   require Logger
 
