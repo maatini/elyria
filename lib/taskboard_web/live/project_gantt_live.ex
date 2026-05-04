@@ -121,7 +121,7 @@ defmodule TaskboardWeb.ProjectGanttLive do
     Taskboard.Projects.ProjectTask
     |> Ash.Query.for_read(:read, %{}, actor: actor)
     |> Ash.Query.filter(project_id == ^project.id)
-    |> Ash.Query.load([:parent, :assigned_group, :chapter_number, :incoming_dependencies])
+    |> Ash.Query.load([:parent, :assigned_group, :chapter_number, :incoming_dependencies, :overdue?, :warning?])
     |> Ash.Query.sort(level: :asc, position: :asc)
     |> Ash.read!()
   rescue
@@ -163,6 +163,13 @@ defmodule TaskboardWeb.ProjectGanttLive do
           |> Enum.filter(& &1)
           |> Enum.join(" · ")
 
+        custom_class =
+          cond do
+            task.overdue? == true -> "gantt-overdue"
+            task.warning? == true -> "gantt-warning"
+            true -> "gantt-#{task.status}"
+          end
+
         [
           %{
             id: task.id,
@@ -171,7 +178,7 @@ defmodule TaskboardWeb.ProjectGanttLive do
             end: Date.to_iso8601(end_d),
             progress: if(task.status in [:done, :skipped], do: 100, else: 0),
             dependencies: deps,
-            custom_class: "gantt-#{task.status}",
+            custom_class: custom_class,
             custom_popup: subtitle
           }
         ]
