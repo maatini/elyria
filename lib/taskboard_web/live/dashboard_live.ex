@@ -90,85 +90,209 @@ defmodule TaskboardWeb.DashboardLive do
       </div>
     </dialog>
 
-    <div class="p-6 max-w-5xl mx-auto">
-      <div class="mb-8">
-        <h1 class="text-2xl font-bold">Dashboard</h1>
-        <p class="text-base-content/60 mt-1">Willkommen, {@current_user.email}</p>
-      </div>
+    <%!-- Hero-Bereich --%>
+    <div class="bg-gradient-to-br from-primary/10 via-base-100 to-base-100 border-b border-base-300 px-8 py-8">
+      <p class="text-sm text-base-content/50 font-medium mb-1">
+        {Calendar.strftime(Date.utc_today(), "%A, %d. %B %Y")}
+      </p>
+      <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+      <p class="text-base-content/60 mt-1 text-sm">
+        Willkommen zurück, <span class="font-medium text-base-content/80">{@current_user.email}</span>
+      </p>
+    </div>
 
+    <div class="p-6 max-w-5xl">
+      <%!-- Stat-Karten --%>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="stat bg-base-200 rounded-box">
-          <div class="stat-title text-xs">Meine Aufgaben</div>
-          <div class="stat-value text-2xl text-primary">{@stats.my_tasks}</div>
-          <div class="stat-desc">offen / in Arbeit</div>
+        <div class="card bg-base-200 border border-base-300 hover:shadow-md transition-shadow">
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
+                Meine Aufgaben
+              </span>
+              <div class="size-8 rounded-lg bg-primary/15 flex items-center justify-center">
+                <.icon name="hero-clipboard-document-check" class="size-4 text-primary" />
+              </div>
+            </div>
+            <div class="text-3xl font-bold text-primary">{@stats.my_tasks}</div>
+            <div class="text-xs text-base-content/50 mt-1">offen / in Arbeit</div>
+          </div>
         </div>
+
         <div
           class={[
-            "stat rounded-box cursor-pointer",
-            (@stats.overdue > 0 && "bg-error/20") || "bg-base-200"
+            "card border hover:shadow-md transition-shadow cursor-pointer",
+            if(@stats.overdue > 0, do: "bg-error/10 border-error/30", else: "bg-base-200 border-base-300")
           ]}
           phx-click={@stats.overdue > 0 && JS.dispatch("click", to: "#critical-tasks-dialog")}
         >
-          <div class="stat-title text-xs">Überfällig</div>
-          <div class={["stat-value text-2xl", (@stats.overdue > 0 && "text-error") || "text-success"]}>
-            {@stats.overdue}
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
+                Überfällig
+              </span>
+              <div class={[
+                "size-8 rounded-lg flex items-center justify-center",
+                if(@stats.overdue > 0, do: "bg-error/20", else: "bg-success/15")
+              ]}>
+                <.icon
+                  name={if(@stats.overdue > 0, do: "hero-exclamation-triangle", else: "hero-check-circle")}
+                  class={["size-4", if(@stats.overdue > 0, do: "text-error", else: "text-success")]}
+                />
+              </div>
+            </div>
+            <div class={["text-3xl font-bold", if(@stats.overdue > 0, do: "text-error", else: "text-success")]}>
+              {@stats.overdue}
+            </div>
+            <div class="text-xs text-base-content/50 mt-1">
+              {if(@stats.overdue > 0, do: "Aufgaben überfällig", else: "Alles im Plan")}
+            </div>
           </div>
-          <div class="stat-desc">Aufgaben</div>
         </div>
-        <div class="stat bg-base-200 rounded-box">
-          <div class="stat-title text-xs">Aktive Projekte</div>
-          <div class="stat-value text-2xl">{@stats.active_projects}</div>
-          <div class="stat-desc">gesamt</div>
+
+        <div class="card bg-base-200 border border-base-300 hover:shadow-md transition-shadow">
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
+                Projekte
+              </span>
+              <div class="size-8 rounded-lg bg-secondary/15 flex items-center justify-center">
+                <.icon name="hero-folder-open" class="size-4 text-secondary" />
+              </div>
+            </div>
+            <div class="text-3xl font-bold">{@stats.active_projects}</div>
+            <div class="text-xs text-base-content/50 mt-1">aktive Projekte</div>
+          </div>
         </div>
-        <div class="stat bg-base-200 rounded-box">
-          <div class="stat-title text-xs">Vorlagen</div>
-          <div class="stat-value text-2xl">{@stats.templates}</div>
-          <div class="stat-desc">aktive</div>
+
+        <div class="card bg-base-200 border border-base-300 hover:shadow-md transition-shadow">
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
+                Vorlagen
+              </span>
+              <div class="size-8 rounded-lg bg-info/15 flex items-center justify-center">
+                <.icon name="hero-document-duplicate" class="size-4 text-info" />
+              </div>
+            </div>
+            <div class="text-3xl font-bold">{@stats.templates}</div>
+            <div class="text-xs text-base-content/50 mt-1">aktive Vorlagen</div>
+          </div>
         </div>
       </div>
 
+      <%!-- Unterer Bereich --%>
       <div class="grid lg:grid-cols-2 gap-4">
-        <div class="card bg-base-200">
-          <div class="card-body">
-            <h2 class="card-title text-base">Schnellzugriff</h2>
-            <div class="flex flex-col gap-2 mt-2">
-              <.link navigate={~p"/my-tasks"} class="btn btn-ghost justify-start gap-3">
-                <.icon name="hero-clipboard-document-check" class="size-5 text-primary" />
-                Meine Aufgaben
+        <%!-- Schnellzugriff --%>
+        <div class="card bg-base-200 border border-base-300">
+          <div class="card-body p-5">
+            <h2 class="font-semibold text-sm text-base-content/60 uppercase tracking-wider mb-3">
+              Schnellzugriff
+            </h2>
+            <div class="space-y-1">
+              <.link
+                navigate={~p"/my-tasks"}
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-base-300 transition-colors group"
+              >
+                <div class="size-8 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                  <.icon name="hero-clipboard-document-check" class="size-4 text-primary" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium">Meine Aufgaben</div>
+                  <div class="text-xs text-base-content/50">{@stats.my_tasks} offen</div>
+                </div>
+                <.icon
+                  name="hero-chevron-right-mini"
+                  class="size-4 text-base-content/30 group-hover:text-base-content/60 transition-colors"
+                />
               </.link>
-              <.link navigate={~p"/projects"} class="btn btn-ghost justify-start gap-3">
-                <.icon name="hero-folder-open" class="size-5 text-secondary" /> Alle Projekte
+              <.link
+                navigate={~p"/projects"}
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-base-300 transition-colors group"
+              >
+                <div class="size-8 rounded-lg bg-secondary/15 flex items-center justify-center shrink-0">
+                  <.icon name="hero-folder-open" class="size-4 text-secondary" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium">Alle Projekte</div>
+                  <div class="text-xs text-base-content/50">{@stats.active_projects} aktiv</div>
+                </div>
+                <.icon
+                  name="hero-chevron-right-mini"
+                  class="size-4 text-base-content/30 group-hover:text-base-content/60 transition-colors"
+                />
               </.link>
-              <.link navigate={~p"/templates"} class="btn btn-ghost justify-start gap-3">
-                <.icon name="hero-document-duplicate" class="size-5 text-accent" /> Vorlagen verwalten
+              <.link
+                navigate={~p"/templates"}
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-base-300 transition-colors group"
+              >
+                <div class="size-8 rounded-lg bg-info/15 flex items-center justify-center shrink-0">
+                  <.icon name="hero-document-duplicate" class="size-4 text-info" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium">Vorlagen</div>
+                  <div class="text-xs text-base-content/50">Templates verwalten</div>
+                </div>
+                <.icon
+                  name="hero-chevron-right-mini"
+                  class="size-4 text-base-content/30 group-hover:text-base-content/60 transition-colors"
+                />
               </.link>
-              <.link navigate={~p"/admin"} class="btn btn-ghost justify-start gap-3">
-                <.icon name="hero-cog-6-tooth" class="size-5 text-neutral" /> Admin-Bereich
+              <.link
+                navigate={~p"/admin"}
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-base-300 transition-colors group"
+              >
+                <div class="size-8 rounded-lg bg-neutral/15 flex items-center justify-center shrink-0">
+                  <.icon name="hero-cog-6-tooth" class="size-4 text-neutral-content/60" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium">Admin-Bereich</div>
+                  <div class="text-xs text-base-content/50">Verwaltung & Einstellungen</div>
+                </div>
+                <.icon
+                  name="hero-chevron-right-mini"
+                  class="size-4 text-base-content/30 group-hover:text-base-content/60 transition-colors"
+                />
               </.link>
             </div>
           </div>
         </div>
 
-        <div class="card bg-base-200">
-          <div class="card-body">
-            <h2 class="card-title text-base">Aktionen</h2>
-            <p class="text-sm text-base-content/60 mt-1">
-              Neue Projekte können über den Admin-Bereich oder die API aus Vorlagen aktiviert werden.
-            </p>
-            <div class="card-actions mt-4">
-              <.link navigate={~p"/admin"} class="btn btn-primary btn-sm">
-                Admin öffnen
-              </.link>
+        <%!-- Aktionen --%>
+        <div class="card bg-base-200 border border-base-300">
+          <div class="card-body p-5">
+            <h2 class="font-semibold text-sm text-base-content/60 uppercase tracking-wider mb-3">
+              Aktionen
+            </h2>
+
+            <div :if={@critical_tasks != []} class="alert bg-warning/15 border border-warning/30 mb-4 p-3">
+              <.icon name="hero-exclamation-triangle" class="size-5 text-warning shrink-0" />
+              <div class="text-sm">
+                <div class="font-medium">{length(@critical_tasks)} kritische Aufgaben</div>
+                <div class="text-xs text-base-content/60 mt-0.5">Sofortiger Handlungsbedarf</div>
+              </div>
               <button
-                :if={@critical_tasks != []}
-                class="btn btn-warning btn-sm"
+                class="btn btn-warning btn-xs ml-auto"
                 phx-click={
                   JS.set_attribute({"class", "modal modal-open"}, to: "#critical-tasks-dialog")
                 }
               >
-                <.icon name="hero-exclamation-triangle" class="size-4" />
-                {length(@critical_tasks)} kritische Aufgaben
+                Anzeigen
               </button>
+            </div>
+
+            <div :if={@critical_tasks == []} class="flex flex-col items-center py-4 text-center">
+              <div class="size-12 rounded-full bg-success/15 flex items-center justify-center mb-3">
+                <.icon name="hero-check-badge" class="size-6 text-success" />
+              </div>
+              <div class="text-sm font-medium">Keine kritischen Aufgaben</div>
+              <div class="text-xs text-base-content/50 mt-1">Alles läuft planmäßig</div>
+            </div>
+
+            <div class="mt-auto pt-3 border-t border-base-300">
+              <.link navigate={~p"/admin"} class="btn btn-primary btn-sm w-full">
+                <.icon name="hero-cog-6-tooth" class="size-4" /> Admin öffnen
+              </.link>
             </div>
           </div>
         </div>

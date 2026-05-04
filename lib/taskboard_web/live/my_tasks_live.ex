@@ -31,26 +31,32 @@ defmodule TaskboardWeb.MyTasksLive do
     assigns = assign(assigns, :filtered_tasks, filtered_tasks(assigns))
 
     ~H"""
-    <div class="p-6 max-w-7xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-bold">Meine Aufgaben</h1>
-          <p class="text-base-content/60 text-sm mt-1">
-            Alle offenen Aufgaben in deinen Gruppen
-          </p>
-        </div>
-        <div class="badge badge-neutral">{length(@tasks)} Aufgaben gesamt</div>
-      </div>
+    <%!-- Page header --%>
+    <div class="bg-gradient-to-br from-primary/8 via-base-100 to-base-100 border-b border-base-300 px-8 py-8">
+      <h1 class="text-3xl font-bold tracking-tight">Meine Aufgaben</h1>
+      <p class="text-base-content/60 mt-1 text-sm">
+        <span class="font-medium text-base-content/80">{length(@tasks)}</span>
+        Aufgaben in deinen Gruppen
+      </p>
+    </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Suchen..."
-          class="input input-bordered w-full sm:w-80"
-          value={@search}
-          phx-change="search"
-          name="search"
-        />
+    <div class="p-6 max-w-7xl">
+      <%!-- Filter-Leiste --%>
+      <div class="flex flex-col sm:flex-row gap-3 mb-6">
+        <div class="relative w-full sm:w-80">
+          <.icon
+            name="hero-magnifying-glass"
+            class="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
+          />
+          <input
+            type="text"
+            placeholder="Aufgaben durchsuchen..."
+            class="input input-bordered w-full pl-9"
+            value={@search}
+            phx-change="search"
+            name="search"
+          />
+        </div>
 
         <div class="tabs tabs-boxed">
           <button
@@ -75,10 +81,20 @@ defmodule TaskboardWeb.MyTasksLive do
             In Arbeit
           </button>
         </div>
+
+        <div class="ml-auto badge badge-neutral self-center hidden sm:flex">
+          {length(@filtered_tasks)} Ergebnisse
+        </div>
       </div>
 
-      <div :if={@filtered_tasks == []} class="text-center py-16 text-base-content/40">
-        <p class="text-lg">Keine Aufgaben gefunden</p>
+      <div :if={@filtered_tasks == []} class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="size-16 rounded-full bg-base-300 flex items-center justify-center mb-4">
+          <.icon name="hero-clipboard-document-check" class="size-8 text-base-content/30" />
+        </div>
+        <h3 class="text-lg font-semibold text-base-content/60">Keine Aufgaben gefunden</h3>
+        <p class="text-sm text-base-content/40 mt-1">
+          {if(@search != "", do: "Versuche einen anderen Suchbegriff.", else: "Du hast aktuell keine offenen Aufgaben.")}
+        </p>
       </div>
 
       <div :if={@filtered_tasks != []} class="overflow-x-auto rounded-box border border-base-300">

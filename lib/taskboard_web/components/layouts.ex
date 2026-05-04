@@ -27,72 +27,162 @@ defmodule TaskboardWeb.Layouts do
   """
   def app(assigns) do
     ~H"""
-    <div class="min-h-screen flex flex-col">
-      <header class="navbar bg-base-200 border-b border-base-300 px-4 sticky top-0 z-50">
-        <div class="navbar-start">
-          <.link navigate={~p"/dashboard"} class="flex items-center gap-2 font-bold text-lg">
-            <span class="text-primary">⬡</span>
-            <span>Taskboard</span>
-          </.link>
-        </div>
+    <div class="drawer lg:drawer-open">
+      <input id="main-drawer" type="checkbox" class="drawer-toggle" />
 
-        <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal gap-1">
-            <li>
-              <.link navigate={~p"/dashboard"} class="text-sm font-medium">Dashboard</.link>
-            </li>
-            <li>
-              <.link navigate={~p"/my-tasks"} class="text-sm font-medium">Meine Aufgaben</.link>
-            </li>
-            <li>
-              <.link navigate={~p"/projects"} class="text-sm font-medium">Projekte</.link>
-            </li>
-            <li>
-              <.link navigate={~p"/templates"} class="text-sm font-medium">Vorlagen</.link>
-            </li>
-          </ul>
-        </div>
-
-        <div class="navbar-end gap-2">
+      <%!-- Main content --%>
+      <div class="drawer-content flex flex-col min-h-screen">
+        <%!-- Mobile header --%>
+        <header class="navbar bg-base-200 border-b border-base-300 px-3 lg:hidden sticky top-0 z-30">
+          <label for="main-drawer" class="btn btn-ghost btn-sm drawer-button">
+            <.icon name="hero-bars-3" class="size-5" />
+          </label>
+          <div class="flex-1 flex justify-center">
+            <span class="font-bold text-lg">
+              <span class="text-primary">⬡</span> Taskboard
+            </span>
+          </div>
           <.theme_toggle />
+        </header>
 
-          <div :if={assigns[:current_user]} class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-2">
-              <.icon name="hero-user-circle" class="size-5" />
-              <span class="hidden sm:inline text-sm max-w-32 truncate">
-                {assigns[:current_user].email}
-              </span>
-              <.icon name="hero-chevron-down-micro" class="size-3" />
-            </div>
-            <ul
-              tabindex="0"
-              class="dropdown-content menu bg-base-200 rounded-box z-50 w-52 p-2 shadow-lg border border-base-300"
-            >
-              <li class="menu-title text-xs truncate px-3 py-1 opacity-60">
-                {assigns[:current_user].email}
-              </li>
-              <li><.link navigate={~p"/admin"}>Admin</.link></li>
+        <main class="flex-1">
+          {@inner_content}
+        </main>
+
+        <.flash_group flash={@flash} />
+      </div>
+
+      <%!-- Sidebar --%>
+      <div class="drawer-side z-40">
+        <label for="main-drawer" aria-label="Menü schließen" class="drawer-overlay"></label>
+
+        <aside class="w-60 min-h-full bg-base-200 border-r border-base-300 flex flex-col">
+          <%!-- Logo --%>
+          <div class="h-16 flex items-center px-5 border-b border-base-300 shrink-0">
+            <.link navigate={~p"/dashboard"} class="flex items-center gap-2.5 font-bold text-lg">
+              <span class="text-primary text-xl leading-none">⬡</span>
+              <span>Taskboard</span>
+            </.link>
+          </div>
+
+          <%!-- Navigation --%>
+          <nav class="flex-1 overflow-y-auto p-3">
+            <p class="text-xs font-semibold text-base-content/40 uppercase tracking-wider px-3 mb-2 mt-1">
+              Navigation
+            </p>
+            <ul class="space-y-0.5">
               <li>
-                <.link href={~p"/sign-out"} method="delete" class="text-error">
-                  Abmelden
+                <.link
+                  navigate={~p"/dashboard"}
+                  class={[
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    if(active_for?(assigns, [TaskboardWeb.DashboardLive]),
+                      do: "bg-primary text-primary-content",
+                      else: "hover:bg-base-300 text-base-content"
+                    )
+                  ]}
+                >
+                  <.icon name="hero-squares-2x2" class="size-5 shrink-0" />
+                  Dashboard
+                </.link>
+              </li>
+              <li>
+                <.link
+                  navigate={~p"/my-tasks"}
+                  class={[
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    if(active_for?(assigns, [TaskboardWeb.MyTasksLive]),
+                      do: "bg-primary text-primary-content",
+                      else: "hover:bg-base-300 text-base-content"
+                    )
+                  ]}
+                >
+                  <.icon name="hero-clipboard-document-check" class="size-5 shrink-0" />
+                  Meine Aufgaben
+                </.link>
+              </li>
+              <li>
+                <.link
+                  navigate={~p"/projects"}
+                  class={[
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    if(
+                      active_for?(assigns, [
+                        TaskboardWeb.ProjectsLive,
+                        TaskboardWeb.ProjectGanttLive
+                      ]),
+                      do: "bg-primary text-primary-content",
+                      else: "hover:bg-base-300 text-base-content"
+                    )
+                  ]}
+                >
+                  <.icon name="hero-folder-open" class="size-5 shrink-0" />
+                  Projekte
+                </.link>
+              </li>
+              <li>
+                <.link
+                  navigate={~p"/templates"}
+                  class={[
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    if(active_for?(assigns, [TaskboardWeb.TemplatesLive]),
+                      do: "bg-primary text-primary-content",
+                      else: "hover:bg-base-300 text-base-content"
+                    )
+                  ]}
+                >
+                  <.icon name="hero-document-duplicate" class="size-5 shrink-0" />
+                  Vorlagen
                 </.link>
               </li>
             </ul>
+          </nav>
+
+          <%!-- Footer: Theme + User --%>
+          <div class="p-3 border-t border-base-300 space-y-2 shrink-0">
+            <.theme_toggle />
+
+            <div :if={assigns[:current_user]} class="dropdown dropdown-top w-full">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-sm w-full justify-start gap-2">
+                <div class="size-7 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                  <.icon name="hero-user-micro" class="size-4 text-primary" />
+                </div>
+                <span class="text-xs truncate flex-1 text-left">
+                  {assigns[:current_user].email}
+                </span>
+                <.icon name="hero-chevron-up-mini" class="size-3 shrink-0" />
+              </div>
+              <ul
+                tabindex="0"
+                class="dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-lg border border-base-300 mb-1"
+              >
+                <li class="menu-title text-xs">
+                  <span class="truncate block">{assigns[:current_user].email}</span>
+                </li>
+                <li><.link navigate={~p"/admin"}>Admin</.link></li>
+                <li>
+                  <.link href={~p"/sign-out"} method="delete" class="text-error">
+                    Abmelden
+                  </.link>
+                </li>
+              </ul>
+            </div>
+
+            <div :if={!assigns[:current_user]}>
+              <.link navigate={~p"/sign-in"} class="btn btn-primary btn-sm w-full">
+                Anmelden
+              </.link>
+            </div>
           </div>
-
-          <div :if={!assigns[:current_user]}>
-            <.link navigate={~p"/sign-in"} class="btn btn-primary btn-sm">Anmelden</.link>
-          </div>
-        </div>
-      </header>
-
-      <main class="flex-1">
-        {@inner_content}
-      </main>
-
-      <.flash_group flash={@flash} />
+        </aside>
+      </div>
     </div>
     """
+  end
+
+  defp active_for?(assigns, view_modules) do
+    current_view = assigns[:socket] && Map.get(assigns[:socket], :view)
+    current_view in view_modules
   end
 
   @doc """
