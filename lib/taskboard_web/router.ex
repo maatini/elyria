@@ -36,7 +36,8 @@ defmodule TaskboardWeb.Router do
   scope "/", TaskboardWeb do
     pipe_through [:browser, :require_auth]
 
-    ash_authentication_live_session :authenticated_routes do
+    ash_authentication_live_session :authenticated_routes,
+      layout: {TaskboardWeb.Layouts, :app} do
       live "/dashboard", DashboardLive, :index
       live "/my-tasks", MyTasksLive, :index
       live "/projects", ProjectsLive, :index

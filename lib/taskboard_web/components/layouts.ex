@@ -25,12 +25,6 @@ defmodule TaskboardWeb.Layouts do
       </Layouts.app>
 
   """
-  attr :flash, :map, required: true, doc: "the map of flash messages"
-  attr :current_user, :any, default: nil
-  attr :current_scope, :map, default: nil
-
-  slot :inner_block, required: true
-
   def app(assigns) do
     ~H"""
     <div class="min-h-screen flex flex-col">
@@ -45,24 +39,16 @@ defmodule TaskboardWeb.Layouts do
         <div class="navbar-center hidden lg:flex">
           <ul class="menu menu-horizontal gap-1">
             <li>
-              <.link navigate={~p"/dashboard"} class="text-sm font-medium">
-                Dashboard
-              </.link>
+              <.link navigate={~p"/dashboard"} class="text-sm font-medium">Dashboard</.link>
             </li>
             <li>
-              <.link navigate={~p"/my-tasks"} class="text-sm font-medium">
-                Meine Aufgaben
-              </.link>
+              <.link navigate={~p"/my-tasks"} class="text-sm font-medium">Meine Aufgaben</.link>
             </li>
             <li>
-              <.link navigate={~p"/projects"} class="text-sm font-medium">
-                Projekte
-              </.link>
+              <.link navigate={~p"/projects"} class="text-sm font-medium">Projekte</.link>
             </li>
             <li>
-              <.link navigate={~p"/templates"} class="text-sm font-medium">
-                Vorlagen
-              </.link>
+              <.link navigate={~p"/templates"} class="text-sm font-medium">Vorlagen</.link>
             </li>
           </ul>
         </div>
@@ -70,11 +56,11 @@ defmodule TaskboardWeb.Layouts do
         <div class="navbar-end gap-2">
           <.theme_toggle />
 
-          <div :if={@current_user} class="dropdown dropdown-end">
+          <div :if={assigns[:current_user]} class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-2">
               <.icon name="hero-user-circle" class="size-5" />
               <span class="hidden sm:inline text-sm max-w-32 truncate">
-                <%= @current_user.email %>
+                <%= assigns[:current_user].email %>
               </span>
               <.icon name="hero-chevron-down-micro" class="size-3" />
             </div>
@@ -83,7 +69,7 @@ defmodule TaskboardWeb.Layouts do
               class="dropdown-content menu bg-base-200 rounded-box z-50 w-52 p-2 shadow-lg border border-base-300"
             >
               <li class="menu-title text-xs truncate px-3 py-1 opacity-60">
-                <%= @current_user.email %>
+                <%= assigns[:current_user].email %>
               </li>
               <li><.link navigate={~p"/admin"}>Admin</.link></li>
               <li>
@@ -94,14 +80,14 @@ defmodule TaskboardWeb.Layouts do
             </ul>
           </div>
 
-          <div :if={!@current_user}>
+          <div :if={!assigns[:current_user]}>
             <.link navigate={~p"/sign-in"} class="btn btn-primary btn-sm">Anmelden</.link>
           </div>
         </div>
       </header>
 
       <main class="flex-1">
-        {render_slot(@inner_block)}
+        {@inner_content}
       </main>
 
       <.flash_group flash={@flash} />

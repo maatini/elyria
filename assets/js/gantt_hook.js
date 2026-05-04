@@ -42,7 +42,6 @@ const GanttHook = {
 
     this.gantt = new Gantt(container, tasks, {
       view_mode: this.viewMode,
-      date_format: "YYYY-MM-DD",
       on_date_change: (task, start, end) => {
         this.pushEvent("gantt-date-change", {
           task_id: task.id,
@@ -53,8 +52,10 @@ const GanttHook = {
       on_click: (task) => {
         this.pushEvent("gantt-task-click", { task_id: task.id })
       },
-      popup: (task) => {
-        return task.custom_popup || task.name
+      popup: (ctrl) => {
+        const t = ctrl.task
+        ctrl.set_title(t.name)
+        ctrl.set_subtitle(t.custom_popup || "")
       }
     })
   },

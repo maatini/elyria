@@ -121,16 +121,14 @@ defmodule TaskboardWeb.ProjectGanttLive do
     Taskboard.Projects.ProjectTask
     |> Ash.Query.for_read(:read, %{}, actor: actor)
     |> Ash.Query.filter(project_id == ^project.id)
-    |> Ash.Query.load([
-      :parent,
-      :assigned_group,
-      :chapter_number,
-      incoming_dependencies: [:predecessor]
-    ])
+    |> Ash.Query.load([:parent, :assigned_group, :chapter_number, :incoming_dependencies])
     |> Ash.Query.sort(level: :asc, position: :asc)
     |> Ash.read!()
   rescue
-    _ -> []
+    e ->
+      require Logger
+      Logger.error("load_tasks failed: #{inspect(e)}")
+      []
   end
 
   defp to_gantt_tasks(tasks) do
@@ -155,13 +153,15 @@ defmodule TaskboardWeb.ProjectGanttLive do
 
         group_name = task.assigned_group && task.assigned_group.name
 
-        custom_popup = """
-        <b>#{label}</b>
-        #{if group_name, do: "<br>Gruppe: #{group_name}", else: ""}
-        <br>Status: #{status_de(task.status)}
-        #{if task.start_date, do: "<br>Start: #{Calendar.strftime(task.start_date, "%d.%m.%Y")}", else: ""}
-        #{if task.end_date, do: "<br>Ende: #{Calendar.strftime(task.end_date, "%d.%m.%Y")}", else: ""}
-        """
+        subtitle =
+          [
+            group_name && "Gruppe: #{group_name}",
+            "Status: #{status_de(task.status)}",
+            task.start_date && "Start: #{Calendar.strftime(task.start_date, "%d.%m.%Y")}",
+            task.end_date && "Ende: #{Calendar.strftime(task.end_date, "%d.%m.%Y")}"
+          ]
+          |> Enum.filter(& &1)
+          |> Enum.join(" · ")
 
         [
           %{
@@ -172,7 +172,7 @@ defmodule TaskboardWeb.ProjectGanttLive do
             progress: if(task.status in [:done, :skipped], do: 100, else: 0),
             dependencies: deps,
             custom_class: "gantt-#{task.status}",
-            custom_popup: custom_popup
+            custom_popup: subtitle
           }
         ]
       end
