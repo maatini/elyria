@@ -42,6 +42,7 @@ defmodule TaskboardWeb.Router do
       live "/my-tasks", MyTasksLive, :index
       live "/projects", ProjectsLive, :index
       live "/projects/:id/gantt", ProjectGanttLive, :index
+      live "/projects/:id/milestones", ProjectMilestonesLive, :index
       live "/templates", TemplatesLive, :index
     end
   end

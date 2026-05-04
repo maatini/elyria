@@ -47,6 +47,7 @@ defmodule Taskboard.Templates.TemplateTask do
     has_many :children, Taskboard.Templates.TemplateTask, destination_attribute: :parent_id
 
     belongs_to :assigned_group, Taskboard.Accounts.Group, allow_nil?: true
+    belongs_to :template_milestone, Taskboard.Templates.TemplateMilestone, allow_nil?: true
 
     has_many :outgoing_dependencies, Taskboard.Templates.TemplateTaskDependency,
       destination_attribute: :predecessor_id
@@ -72,7 +73,8 @@ defmodule Taskboard.Templates.TemplateTask do
         :custom_field_defaults,
         :template_id,
         :parent_id,
-        :assigned_group_id
+        :assigned_group_id,
+        :template_milestone_id
       ])
 
       change(Taskboard.Templates.TemplateTask.Changes.EnsureValidLevel)
@@ -87,7 +89,8 @@ defmodule Taskboard.Templates.TemplateTask do
         :end_offset_days,
         :warning_offset_days,
         :custom_field_defaults,
-        :assigned_group_id
+        :assigned_group_id,
+        :template_milestone_id
       ])
 
       require_atomic?(false)

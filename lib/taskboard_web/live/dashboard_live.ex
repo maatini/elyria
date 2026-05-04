@@ -8,12 +8,14 @@ defmodule TaskboardWeb.DashboardLive do
     current_user = socket.assigns.current_user
     stats = load_stats(current_user)
     critical = load_critical_tasks(current_user)
+    critical_milestones = load_critical_milestones(current_user)
 
     {:ok,
      socket
      |> assign(:page_title, "Dashboard")
      |> assign(:stats, stats)
      |> assign(:critical_tasks, critical)
+     |> assign(:critical_milestones, critical_milestones)
      |> assign(:show_alert, critical != [])}
   end
 
@@ -179,6 +181,45 @@ defmodule TaskboardWeb.DashboardLive do
             <div class="text-xs text-base-content/50 mt-1">aktive Vorlagen</div>
           </div>
         </div>
+
+        <div
+          class={[
+            "card border hover:shadow-md transition-shadow",
+            if(length(@critical_milestones) > 0,
+              do: "bg-warning/10 border-warning/30",
+              else: "bg-base-200 border-base-300"
+            )
+          ]}
+        >
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
+                Meilensteine
+              </span>
+              <div class={[
+                "size-8 rounded-lg flex items-center justify-center",
+                if(length(@critical_milestones) > 0, do: "bg-warning/20", else: "bg-base-300")
+              ]}>
+                <.icon
+                  name="hero-flag"
+                  class={[
+                    "size-4",
+                    if(length(@critical_milestones) > 0, do: "text-warning", else: "text-base-content/40")
+                  ]}
+                />
+              </div>
+            </div>
+            <div class={[
+              "text-3xl font-bold",
+              if(length(@critical_milestones) > 0, do: "text-warning", else: "")
+            ]}>
+              {length(@critical_milestones)}
+            </div>
+            <div class="text-xs text-base-content/50 mt-1">
+              {if(length(@critical_milestones) > 0, do: "mit Warnung / überfällig", else: "alles im Plan")}
+            </div>
+          </div>
+        </div>
       </div>
 
       <%!-- Unterer Bereich --%>
@@ -265,7 +306,7 @@ defmodule TaskboardWeb.DashboardLive do
               Aktionen
             </h2>
 
-            <div :if={@critical_tasks != []} class="alert bg-warning/15 border border-warning/30 mb-4 p-3">
+            <div :if={@critical_tasks != []} class="alert bg-warning/15 border border-warning/30 mb-2 p-3">
               <.icon name="hero-exclamation-triangle" class="size-5 text-warning shrink-0" />
               <div class="text-sm">
                 <div class="font-medium">{length(@critical_tasks)} kritische Aufgaben</div>
@@ -279,6 +320,26 @@ defmodule TaskboardWeb.DashboardLive do
               >
                 Anzeigen
               </button>
+            </div>
+
+            <div
+              :if={@critical_milestones != []}
+              class="alert bg-error/10 border border-error/30 mb-2 p-3"
+            >
+              <.icon name="hero-flag" class="size-5 text-error shrink-0" />
+              <div class="text-sm">
+                <div class="font-medium">{length(@critical_milestones)} Meilenstein-Warnungen</div>
+                <div class="text-xs text-base-content/60 mt-0.5">
+                  {Enum.map_join(Enum.take(@critical_milestones, 2), ", ", & &1.name)}
+                  {if length(@critical_milestones) > 2, do: "…", else: ""}
+                </div>
+              </div>
+              <.link
+                navigate={~p"/projects"}
+                class="btn btn-error btn-xs ml-auto"
+              >
+                Projekte
+              </.link>
             </div>
 
             <div :if={@critical_tasks == []} class="flex flex-col items-center py-4 text-center">
@@ -308,6 +369,28 @@ defmodule TaskboardWeb.DashboardLive do
     |> Ash.read!()
     |> Enum.filter(fn t -> t.overdue? == true or t.warning? == true end)
     |> Enum.sort_by(fn t -> {if(t.overdue?, do: 0, else: 1), t.end_date} end)
+  rescue
+    _ -> []
+  end
+
+  defp load_critical_milestones(current_user) do
+    project_ids =
+      Taskboard.Projects.Project
+      |> Ash.Query.for_read(:read, %{}, actor: current_user)
+      |> Ash.Query.filter(status == :active)
+      |> Ash.read!(authorize?: false)
+      |> Enum.map(& &1.id)
+
+    if project_ids == [] do
+      []
+    else
+      Taskboard.Projects.Milestone
+      |> Ash.Query.filter(project_id in ^project_ids)
+      |> Ash.Query.load([:fulfilled?, :overdue?, :warning?])
+      |> Ash.read!(authorize?: false)
+      |> Enum.filter(fn m -> m.overdue? == true or m.warning? == true end)
+      |> Enum.sort_by(fn m -> {if(m.overdue?, do: 0, else: 1), m.due_date} end)
+    end
   rescue
     _ -> []
   end

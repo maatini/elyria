@@ -34,8 +34,8 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
   end
 
   defp after_activate(_changeset, project, template_id, reference_date) do
-    with {:ok, {tasks, deps}} <- load_template_data(template_id) do
-      create_tasks_and_deps(project, tasks, deps, reference_date)
+    with {:ok, {tasks, deps, template_milestones}} <- load_template_data(template_id) do
+      create_tasks_deps_and_milestones(project, tasks, deps, template_milestones, reference_date)
     end
   end
 
@@ -48,12 +48,40 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
          {:ok, deps} <-
            Taskboard.Templates.TemplateTaskDependency
            |> Ash.Query.filter(predecessor_id in ^task_ids)
+           |> Ash.read(authorize?: false),
+         {:ok, template_milestones} <-
+           Taskboard.Templates.TemplateMilestone
+           |> Ash.Query.filter(template_id == ^template_id)
            |> Ash.read(authorize?: false) do
-      {:ok, {tasks, deps}}
+      {:ok, {tasks, deps, template_milestones}}
     end
   end
 
-  defp create_tasks_and_deps(project, all_tasks, all_deps, reference_date) do
+  defp create_tasks_deps_and_milestones(project, all_tasks, all_deps, template_milestones, reference_date) do
+    # 1. Create Milestones and build template_milestone_id → milestone_id map
+    milestone_id_map =
+      Enum.reduce(template_milestones, %{}, fn tm, acc ->
+        due_date = Date.add(reference_date, tm.due_offset_days)
+        warning_date = Date.add(due_date, -tm.warning_offset_days)
+
+        {:ok, milestone} =
+          Ash.create(
+            Taskboard.Projects.Milestone,
+            %{
+              name: tm.name,
+              description: tm.description,
+              due_date: due_date,
+              warning_date: warning_date,
+              project_id: project.id,
+              template_milestone_id: tm.id
+            },
+            authorize?: false
+          )
+
+        Map.put(acc, tm.id, milestone.id)
+      end)
+
+    # 2. Create ProjectTasks (with milestone_id from map)
     tasks_with_incoming_deps = MapSet.new(all_deps, & &1.successor_id)
 
     root_tasks =
@@ -68,7 +96,7 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
         {:ok, pt} =
           Ash.create(
             Taskboard.Projects.ProjectTask,
-            task_attrs(task, project.id, nil, reference_date, status),
+            task_attrs(task, project.id, nil, reference_date, status, milestone_id_map),
             authorize?: false
           )
 
@@ -82,7 +110,7 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
           {:ok, child_pt} =
             Ash.create(
               Taskboard.Projects.ProjectTask,
-              task_attrs(child, project.id, pt.id, reference_date, child_status),
+              task_attrs(child, project.id, pt.id, reference_date, child_status, milestone_id_map),
               authorize?: false
             )
 
@@ -90,6 +118,7 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
         end)
       end)
 
+    # 3. Create dependencies
     Enum.each(all_deps, fn dep ->
       pred = Map.get(task_id_map, dep.predecessor_id)
       succ = Map.get(task_id_map, dep.successor_id)
@@ -116,7 +145,7 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
     |> Enum.sort_by(& &1.position)
   end
 
-  defp task_attrs(task, project_id, parent_id, reference_date, status) do
+  defp task_attrs(task, project_id, parent_id, reference_date, status, milestone_id_map) do
     start_date = Date.add(reference_date, task.start_offset_days || 0)
     end_date = Date.add(reference_date, task.end_offset_days || 7)
 
@@ -125,6 +154,9 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
         nil -> nil
         days -> Date.add(end_date, -days)
       end
+
+    milestone_id =
+      task.template_milestone_id && Map.get(milestone_id_map, task.template_milestone_id)
 
     %{
       title: task.title,
@@ -139,7 +171,8 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
       project_id: project_id,
       parent_id: parent_id,
       assigned_group_id: task.assigned_group_id,
-      custom_field_values: task.custom_field_defaults || %{}
+      custom_field_values: task.custom_field_defaults || %{},
+      milestone_id: milestone_id
     }
   end
 end

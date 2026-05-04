@@ -13,5 +13,6 @@ defmodule Taskboard.Projects do
     resource(Taskboard.Projects.Project)
     resource(Taskboard.Projects.ProjectTask)
     resource(Taskboard.Projects.ProjectTaskDependency)
+    resource(Taskboard.Projects.Milestone)
   end
 end

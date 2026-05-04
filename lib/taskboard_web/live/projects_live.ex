@@ -71,13 +71,20 @@ defmodule TaskboardWeb.ProjectsLive do
               </span>
             </div>
 
-            <div class="card-actions mt-auto">
+            <div class="card-actions mt-auto gap-2">
               <.link
                 navigate={~p"/projects/#{project.id}/gantt"}
                 class="btn btn-primary btn-sm gap-1.5 flex-1"
               >
                 <.icon name="hero-chart-bar" class="size-4" />
-                Gantt öffnen
+                Gantt
+              </.link>
+              <.link
+                navigate={~p"/projects/#{project.id}/milestones"}
+                class="btn btn-ghost btn-sm gap-1.5"
+              >
+                <.icon name="hero-flag" class="size-4" />
+                Meilensteine
               </.link>
             </div>
           </div>

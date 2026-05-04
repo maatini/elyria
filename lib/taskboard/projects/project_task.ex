@@ -62,6 +62,7 @@ defmodule Taskboard.Projects.ProjectTask do
 
     # Link back to the template task it was created from
     belongs_to :template_task, Taskboard.Templates.TemplateTask, allow_nil?: true
+    belongs_to :milestone, Taskboard.Projects.Milestone, allow_nil?: true
 
     has_many :outgoing_dependencies, Taskboard.Projects.ProjectTaskDependency,
       destination_attribute: :predecessor_id
@@ -90,7 +91,8 @@ defmodule Taskboard.Projects.ProjectTask do
         :project_id,
         :parent_id,
         :template_task_id,
-        :assigned_group_id
+        :assigned_group_id,
+        :milestone_id
       ])
     end
 
@@ -144,6 +146,11 @@ defmodule Taskboard.Projects.ProjectTask do
       accept([])
       require_atomic?(false)
       change({AshStateMachine.BuiltinChanges.TransitionState, target: :blocked})
+    end
+
+    update :assign_milestone do
+      accept([:milestone_id])
+      require_atomic?(false)
     end
 
     read :my_tasks do
