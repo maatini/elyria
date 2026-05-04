@@ -5,7 +5,7 @@ defmodule Taskboard.Accounts.Token do
     extensions: [AshAuthentication.TokenResource]
 
   postgres do
-    table "tokens"
-    repo Taskboard.Repo
+    table("tokens")
+    repo(Taskboard.Repo)
   end
 end

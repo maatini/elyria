@@ -20,8 +20,7 @@ defmodule TaskboardWeb.TemplatesLive do
       <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold">Vorlagen</h1>
         <.link navigate={~p"/admin"} class="btn btn-ghost btn-sm">
-          <.icon name="hero-pencil-square" class="size-4" />
-          Admin
+          <.icon name="hero-pencil-square" class="size-4" /> Admin
         </.link>
       </div>
 
@@ -40,19 +39,22 @@ defmodule TaskboardWeb.TemplatesLive do
           <div class="card-body py-4">
             <div class="flex items-start justify-between gap-4">
               <div class="flex-1 min-w-0">
-                <h2 class="card-title text-base truncate"><%= template.name %></h2>
+                <h2 class="card-title text-base truncate">{template.name}</h2>
                 <p :if={template.description} class="text-sm text-base-content/60 mt-1">
-                  <%= template.description %>
+                  {template.description}
                 </p>
                 <div class="flex flex-wrap gap-2 mt-2">
                   <span class={["badge badge-sm", status_badge_class(template.status)]}>
-                    <%= status_label(template.status) %>
+                    {status_label(template.status)}
                   </span>
                   <span :if={template.family} class="badge badge-ghost badge-sm">
-                    <%= template.family %>
+                    {template.family}
                   </span>
-                  <span :for={ct <- template.allowed_context_types} class="badge badge-outline badge-sm">
-                    <%= ct %>
+                  <span
+                    :for={ct <- template.allowed_context_types}
+                    class="badge badge-outline badge-sm"
+                  >
+                    {ct}
                   </span>
                 </div>
               </div>

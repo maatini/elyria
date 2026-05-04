@@ -3,14 +3,14 @@ defmodule Taskboard.Projects do
     extensions: [AshAdmin.Domain]
 
   admin do
-    show? true
+    show?(true)
   end
 
   resources do
-    resource Taskboard.Projects.Context
-    resource Taskboard.Projects.ProjectType
-    resource Taskboard.Projects.Project
-    resource Taskboard.Projects.ProjectTask
-    resource Taskboard.Projects.ProjectTaskDependency
+    resource(Taskboard.Projects.Context)
+    resource(Taskboard.Projects.ProjectType)
+    resource(Taskboard.Projects.Project)
+    resource(Taskboard.Projects.ProjectTask)
+    resource(Taskboard.Projects.ProjectTaskDependency)
   end
 end

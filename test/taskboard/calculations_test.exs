@@ -46,6 +46,7 @@ defmodule Taskboard.CalculationsTest do
         %{status: :open, end_date: ~D[2099-01-01]},
         %{status: :done, end_date: ~D[2020-01-01]}
       ]
+
       assert Overdue.calculate(records, [], %{}) == [true, false, false]
     end
   end
@@ -59,6 +60,7 @@ defmodule Taskboard.CalculationsTest do
           end_date: ~D[2099-12-31]
         }
       ]
+
       assert Warning.calculate(records, [], %{}) == [true]
     end
 
@@ -70,6 +72,7 @@ defmodule Taskboard.CalculationsTest do
           end_date: ~D[2099-12-31]
         }
       ]
+
       assert Warning.calculate(records, [], %{}) == [false]
     end
 
@@ -81,6 +84,7 @@ defmodule Taskboard.CalculationsTest do
           end_date: ~D[2099-12-31]
         }
       ]
+
       assert Warning.calculate(records, [], %{}) == [false]
     end
 
@@ -97,6 +101,7 @@ defmodule Taskboard.CalculationsTest do
           end_date: ~D[2020-02-01]
         }
       ]
+
       assert Warning.calculate(records, [], %{}) == [false]
     end
   end
@@ -123,6 +128,7 @@ defmodule Taskboard.CalculationsTest do
         %{level: 1, position: 1, parent: %{position: 1}},
         %{level: 1, position: 2, parent: %{position: 1}}
       ]
+
       assert ChapterNumber.calculate(records, [], %{}) == ["1", "1.1", "1.2"]
     end
   end

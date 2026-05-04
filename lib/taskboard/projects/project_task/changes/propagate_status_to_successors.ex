@@ -25,7 +25,8 @@ defmodule Taskboard.Projects.ProjectTask.Changes.PropagateStatusToSuccessors do
   end
 
   defp maybe_unblock(successor_id) do
-    with {:ok, successor} <- Ash.get(Taskboard.Projects.ProjectTask, successor_id, authorize?: false),
+    with {:ok, successor} <-
+           Ash.get(Taskboard.Projects.ProjectTask, successor_id, authorize?: false),
          true <- successor.status == :blocked,
          {:ok, incoming} <-
            Taskboard.Projects.ProjectTaskDependency

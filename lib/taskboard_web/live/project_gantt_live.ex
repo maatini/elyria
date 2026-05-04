@@ -38,7 +38,11 @@ defmodule TaskboardWeb.ProjectGanttLive do
   end
 
   @impl true
-  def handle_event("gantt-date-change", %{"task_id" => task_id, "start" => start, "end" => end_date}, socket) do
+  def handle_event(
+        "gantt-date-change",
+        %{"task_id" => task_id, "start" => start, "end" => end_date},
+        socket
+      ) do
     with task when not is_nil(task) <- Enum.find(socket.assigns.tasks, &(&1.id == task_id)),
          {:ok, start_date} <- Date.from_iso8601(start),
          {:ok, end_d} <- Date.from_iso8601(end_date) do
@@ -77,7 +81,7 @@ defmodule TaskboardWeb.ProjectGanttLive do
         <.link navigate={~p"/projects"} class="btn btn-ghost btn-sm">
           ← Projekte
         </.link>
-        <h1 class="text-xl font-bold flex-1"><%= @project.name %></h1>
+        <h1 class="text-xl font-bold flex-1">{@project.name}</h1>
 
         <div class="join">
           <button
@@ -86,7 +90,7 @@ defmodule TaskboardWeb.ProjectGanttLive do
             phx-click="set-view-mode"
             phx-value-mode={mode}
           >
-            <%= mode %>
+            {mode}
           </button>
         </div>
       </div>
@@ -121,7 +125,14 @@ defmodule TaskboardWeb.ProjectGanttLive do
     Taskboard.Projects.ProjectTask
     |> Ash.Query.for_read(:read, %{}, actor: actor)
     |> Ash.Query.filter(project_id == ^project.id)
-    |> Ash.Query.load([:parent, :assigned_group, :chapter_number, :incoming_dependencies, :overdue?, :warning?])
+    |> Ash.Query.load([
+      :parent,
+      :assigned_group,
+      :chapter_number,
+      :incoming_dependencies,
+      :overdue?,
+      :warning?
+    ])
     |> Ash.Query.sort(level: :asc, position: :asc)
     |> Ash.read!()
   rescue

@@ -29,7 +29,10 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
         end)
 
       {:error, _} ->
-        Ash.Changeset.add_error(changeset, field: :template_id, message: "Template nicht gefunden")
+        Ash.Changeset.add_error(changeset,
+          field: :template_id,
+          message: "Template nicht gefunden"
+        )
     end
   end
 

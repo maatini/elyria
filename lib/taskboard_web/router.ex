@@ -27,10 +27,10 @@ defmodule TaskboardWeb.Router do
 
     get "/", PageController, :home
 
-    sign_in_route register_path: "/register", reset_path: "/reset", auth_routes_prefix: "/auth"
-    sign_out_route AuthController
-    auth_routes AuthController, Taskboard.Accounts.User, path: "/auth"
-    reset_route []
+    sign_in_route(register_path: "/register", reset_path: "/reset", auth_routes_prefix: "/auth")
+    sign_out_route(AuthController)
+    auth_routes(AuthController, Taskboard.Accounts.User, path: "/auth")
+    reset_route([])
   end
 
   scope "/", TaskboardWeb do
@@ -48,7 +48,7 @@ defmodule TaskboardWeb.Router do
 
   scope "/" do
     pipe_through [:browser, :require_auth]
-    ash_admin "/admin"
+    ash_admin("/admin")
   end
 
   if Application.compile_env(:taskboard, :dev_routes) do

@@ -60,7 +60,7 @@ defmodule TaskboardWeb.Layouts do
             <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-2">
               <.icon name="hero-user-circle" class="size-5" />
               <span class="hidden sm:inline text-sm max-w-32 truncate">
-                <%= assigns[:current_user].email %>
+                {assigns[:current_user].email}
               </span>
               <.icon name="hero-chevron-down-micro" class="size-3" />
             </div>
@@ -69,7 +69,7 @@ defmodule TaskboardWeb.Layouts do
               class="dropdown-content menu bg-base-200 rounded-box z-50 w-52 p-2 shadow-lg border border-base-300"
             >
               <li class="menu-title text-xs truncate px-3 py-1 opacity-60">
-                <%= assigns[:current_user].email %>
+                {assigns[:current_user].email}
               </li>
               <li><.link navigate={~p"/admin"}>Admin</.link></li>
               <li>

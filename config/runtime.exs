@@ -57,9 +57,10 @@ if config_env() == :prod do
 
   config :taskboard, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :taskboard, :token_signing_secret,
-    System.get_env("TOKEN_SIGNING_SECRET") ||
-      raise("TOKEN_SIGNING_SECRET environment variable is missing")
+  config :taskboard,
+         :token_signing_secret,
+         System.get_env("TOKEN_SIGNING_SECRET") ||
+           raise("TOKEN_SIGNING_SECRET environment variable is missing")
 
   config :taskboard, TaskboardWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],

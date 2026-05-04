@@ -4,17 +4,18 @@ defmodule Taskboard.Accounts.GroupMembership do
     data_layer: AshPostgres.DataLayer
 
   postgres do
-    table "group_memberships"
-    repo Taskboard.Repo
+    table("group_memberships")
+    repo(Taskboard.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
-    attribute :role, :atom,
+    attribute(:role, :atom,
       constraints: [one_of: [:member, :lead]],
       default: :member,
       public?: true
+    )
 
     timestamps()
   end
@@ -25,10 +26,10 @@ defmodule Taskboard.Accounts.GroupMembership do
   end
 
   identities do
-    identity :unique_membership, [:group_id, :user_id]
+    identity(:unique_membership, [:group_id, :user_id])
   end
 
   actions do
-    defaults [:read, :destroy, create: [:group_id, :user_id, :role], update: [:role]]
+    defaults([:read, :destroy, create: [:group_id, :user_id, :role], update: [:role]])
   end
 end

@@ -4,7 +4,7 @@ defmodule Taskboard.Projects.ActivationTest do
   require Ash.Query
 
   alias Taskboard.Factory
-  alias Taskboard.Projects.{Project, ProjectTask, ProjectTaskDependency}
+  alias Taskboard.Projects.{ProjectTask, ProjectTaskDependency}
 
   describe "Project.activate/1" do
     test "creates project with tasks from template" do

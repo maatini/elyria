@@ -35,7 +35,7 @@ defmodule TaskboardWeb.DashboardLive do
         <div class="flex items-center gap-3 mb-4">
           <.icon name="hero-exclamation-triangle" class="size-6 text-warning" />
           <h3 class="text-lg font-bold">Kritische Aufgaben</h3>
-          <span class="badge badge-warning ml-auto"><%= length(@critical_tasks) %></span>
+          <span class="badge badge-warning ml-auto">{length(@critical_tasks)}</span>
         </div>
 
         <p class="text-sm text-base-content/60 mb-4">
@@ -54,22 +54,25 @@ defmodule TaskboardWeb.DashboardLive do
               </tr>
             </thead>
             <tbody>
-              <tr :for={task <- @critical_tasks} class={task.overdue? && "bg-error/10" || "bg-warning/10"}>
+              <tr
+                :for={task <- @critical_tasks}
+                class={(task.overdue? && "bg-error/10") || "bg-warning/10"}
+              >
                 <td>
                   <span :if={task.overdue?} class="badge badge-error badge-xs">!</span>
                   <span :if={!task.overdue?} class="badge badge-warning badge-xs">~</span>
                 </td>
-                <td class="font-medium"><%= task.title %></td>
+                <td class="font-medium">{task.title}</td>
                 <td class="text-xs text-base-content/60">
-                  <%= task.project && task.project.name || "–" %>
+                  {(task.project && task.project.name) || "–"}
                 </td>
                 <td>
                   <span :if={task.assigned_group} class="badge badge-ghost badge-xs">
-                    <%= task.assigned_group.name %>
+                    {task.assigned_group.name}
                   </span>
                 </td>
                 <td class="text-xs">
-                  <%= task.end_date && Calendar.strftime(task.end_date, "%d.%m.%Y") || "–" %>
+                  {(task.end_date && Calendar.strftime(task.end_date, "%d.%m.%Y")) || "–"}
                 </td>
               </tr>
             </tbody>
@@ -90,33 +93,36 @@ defmodule TaskboardWeb.DashboardLive do
     <div class="p-6 max-w-5xl mx-auto">
       <div class="mb-8">
         <h1 class="text-2xl font-bold">Dashboard</h1>
-        <p class="text-base-content/60 mt-1">Willkommen, <%= @current_user.email %></p>
+        <p class="text-base-content/60 mt-1">Willkommen, {@current_user.email}</p>
       </div>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="stat bg-base-200 rounded-box">
           <div class="stat-title text-xs">Meine Aufgaben</div>
-          <div class="stat-value text-2xl text-primary"><%= @stats.my_tasks %></div>
+          <div class="stat-value text-2xl text-primary">{@stats.my_tasks}</div>
           <div class="stat-desc">offen / in Arbeit</div>
         </div>
         <div
-          class={["stat rounded-box cursor-pointer", @stats.overdue > 0 && "bg-error/20" || "bg-base-200"]}
+          class={[
+            "stat rounded-box cursor-pointer",
+            (@stats.overdue > 0 && "bg-error/20") || "bg-base-200"
+          ]}
           phx-click={@stats.overdue > 0 && JS.dispatch("click", to: "#critical-tasks-dialog")}
         >
           <div class="stat-title text-xs">Überfällig</div>
-          <div class={["stat-value text-2xl", @stats.overdue > 0 && "text-error" || "text-success"]}>
-            <%= @stats.overdue %>
+          <div class={["stat-value text-2xl", (@stats.overdue > 0 && "text-error") || "text-success"]}>
+            {@stats.overdue}
           </div>
           <div class="stat-desc">Aufgaben</div>
         </div>
         <div class="stat bg-base-200 rounded-box">
           <div class="stat-title text-xs">Aktive Projekte</div>
-          <div class="stat-value text-2xl"><%= @stats.active_projects %></div>
+          <div class="stat-value text-2xl">{@stats.active_projects}</div>
           <div class="stat-desc">gesamt</div>
         </div>
         <div class="stat bg-base-200 rounded-box">
           <div class="stat-title text-xs">Vorlagen</div>
-          <div class="stat-value text-2xl"><%= @stats.templates %></div>
+          <div class="stat-value text-2xl">{@stats.templates}</div>
           <div class="stat-desc">aktive</div>
         </div>
       </div>
@@ -131,16 +137,13 @@ defmodule TaskboardWeb.DashboardLive do
                 Meine Aufgaben
               </.link>
               <.link navigate={~p"/projects"} class="btn btn-ghost justify-start gap-3">
-                <.icon name="hero-folder-open" class="size-5 text-secondary" />
-                Alle Projekte
+                <.icon name="hero-folder-open" class="size-5 text-secondary" /> Alle Projekte
               </.link>
               <.link navigate={~p"/templates"} class="btn btn-ghost justify-start gap-3">
-                <.icon name="hero-document-duplicate" class="size-5 text-accent" />
-                Vorlagen verwalten
+                <.icon name="hero-document-duplicate" class="size-5 text-accent" /> Vorlagen verwalten
               </.link>
               <.link navigate={~p"/admin"} class="btn btn-ghost justify-start gap-3">
-                <.icon name="hero-cog-6-tooth" class="size-5 text-neutral" />
-                Admin-Bereich
+                <.icon name="hero-cog-6-tooth" class="size-5 text-neutral" /> Admin-Bereich
               </.link>
             </div>
           </div>
@@ -159,10 +162,12 @@ defmodule TaskboardWeb.DashboardLive do
               <button
                 :if={@critical_tasks != []}
                 class="btn btn-warning btn-sm"
-                phx-click={JS.set_attribute({"class", "modal modal-open"}, to: "#critical-tasks-dialog")}
+                phx-click={
+                  JS.set_attribute({"class", "modal modal-open"}, to: "#critical-tasks-dialog")
+                }
               >
                 <.icon name="hero-exclamation-triangle" class="size-4" />
-                <%= length(@critical_tasks) %> kritische Aufgaben
+                {length(@critical_tasks)} kritische Aufgaben
               </button>
             </div>
           </div>
@@ -193,9 +198,10 @@ defmodule TaskboardWeb.DashboardLive do
         _ -> []
       end
 
-    overdue = Enum.count(my_tasks, fn t ->
-      t.end_date != nil and Date.compare(t.end_date, Date.utc_today()) == :lt
-    end)
+    overdue =
+      Enum.count(my_tasks, fn t ->
+        t.end_date != nil and Date.compare(t.end_date, Date.utc_today()) == :lt
+      end)
 
     active_projects =
       try do

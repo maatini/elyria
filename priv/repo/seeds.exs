@@ -44,10 +44,12 @@ admin =
     {:error, _} ->
       IO.puts("   User existiert bereits, lade...")
       email_val = "admin@demo.local"
+
       {:ok, existing} =
         User
         |> Ash.Query.filter(email == ^email_val)
         |> Ash.read_one(authorize?: false)
+
       existing
   end
 
@@ -75,84 +77,231 @@ IO.puts("   Template: #{template.name}")
 
 # --- Kapitel 1: Bauvorbereitung ---
 kap1 =
-  Ash.create!(TemplateTask, %{title: "Bauvorbereitung", level: 0, position: 1,
-    start_offset_days: -90, end_offset_days: -30,
-    template_id: template.id, assigned_group_id: bau.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Bauvorbereitung",
+      level: 0,
+      position: 1,
+      start_offset_days: -90,
+      end_offset_days: -30,
+      template_id: template.id,
+      assigned_group_id: bau.id
+    },
+    authorize?: false
+  )
 
 t1_1 =
-  Ash.create!(TemplateTask, %{title: "Bauplan freigeben", level: 1, position: 1,
-    start_offset_days: -90, end_offset_days: -75, warning_offset_days: 5,
-    template_id: template.id, parent_id: kap1.id, assigned_group_id: bau.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Bauplan freigeben",
+      level: 1,
+      position: 1,
+      start_offset_days: -90,
+      end_offset_days: -75,
+      warning_offset_days: 5,
+      template_id: template.id,
+      parent_id: kap1.id,
+      assigned_group_id: bau.id
+    },
+    authorize?: false
+  )
 
 t1_2 =
-  Ash.create!(TemplateTask, %{title: "Baugenehmigung einholen", level: 1, position: 2,
-    start_offset_days: -75, end_offset_days: -60, warning_offset_days: 7,
-    template_id: template.id, parent_id: kap1.id, assigned_group_id: bau.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Baugenehmigung einholen",
+      level: 1,
+      position: 2,
+      start_offset_days: -75,
+      end_offset_days: -60,
+      warning_offset_days: 7,
+      template_id: template.id,
+      parent_id: kap1.id,
+      assigned_group_id: bau.id
+    },
+    authorize?: false
+  )
 
 t1_3 =
-  Ash.create!(TemplateTask, %{title: "Rohbau abschließen", level: 1, position: 3,
-    start_offset_days: -60, end_offset_days: -30, warning_offset_days: 10,
-    template_id: template.id, parent_id: kap1.id, assigned_group_id: bau.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Rohbau abschließen",
+      level: 1,
+      position: 3,
+      start_offset_days: -60,
+      end_offset_days: -30,
+      warning_offset_days: 10,
+      template_id: template.id,
+      parent_id: kap1.id,
+      assigned_group_id: bau.id
+    },
+    authorize?: false
+  )
 
 # --- Kapitel 2: Einrichtung ---
 kap2 =
-  Ash.create!(TemplateTask, %{title: "Einrichtung & Ausstattung", level: 0, position: 2,
-    start_offset_days: -30, end_offset_days: -7,
-    template_id: template.id, assigned_group_id: eröffnungsteam.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Einrichtung & Ausstattung",
+      level: 0,
+      position: 2,
+      start_offset_days: -30,
+      end_offset_days: -7,
+      template_id: template.id,
+      assigned_group_id: eröffnungsteam.id
+    },
+    authorize?: false
+  )
 
 t2_1 =
-  Ash.create!(TemplateTask, %{title: "Regale und Möbel aufbauen", level: 1, position: 1,
-    start_offset_days: -30, end_offset_days: -20, warning_offset_days: 3,
-    template_id: template.id, parent_id: kap2.id, assigned_group_id: eröffnungsteam.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Regale und Möbel aufbauen",
+      level: 1,
+      position: 1,
+      start_offset_days: -30,
+      end_offset_days: -20,
+      warning_offset_days: 3,
+      template_id: template.id,
+      parent_id: kap2.id,
+      assigned_group_id: eröffnungsteam.id
+    },
+    authorize?: false
+  )
 
 t2_2 =
-  Ash.create!(TemplateTask, %{title: "Kassensysteme installieren", level: 1, position: 2,
-    start_offset_days: -20, end_offset_days: -14, warning_offset_days: 3,
-    template_id: template.id, parent_id: kap2.id, assigned_group_id: bau.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Kassensysteme installieren",
+      level: 1,
+      position: 2,
+      start_offset_days: -20,
+      end_offset_days: -14,
+      warning_offset_days: 3,
+      template_id: template.id,
+      parent_id: kap2.id,
+      assigned_group_id: bau.id
+    },
+    authorize?: false
+  )
 
 t2_3 =
-  Ash.create!(TemplateTask, %{title: "Erstbefüllung Warenbestand", level: 1, position: 3,
-    start_offset_days: -14, end_offset_days: -3, warning_offset_days: 2,
-    template_id: template.id, parent_id: kap2.id, assigned_group_id: eröffnungsteam.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Erstbefüllung Warenbestand",
+      level: 1,
+      position: 3,
+      start_offset_days: -14,
+      end_offset_days: -3,
+      warning_offset_days: 2,
+      template_id: template.id,
+      parent_id: kap2.id,
+      assigned_group_id: eröffnungsteam.id
+    },
+    authorize?: false
+  )
 
 # --- Kapitel 3: Marketing ---
 kap3 =
-  Ash.create!(TemplateTask, %{title: "Marketing & Kommunikation", level: 0, position: 3,
-    start_offset_days: -60, end_offset_days: 0,
-    template_id: template.id, assigned_group_id: marketing.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Marketing & Kommunikation",
+      level: 0,
+      position: 3,
+      start_offset_days: -60,
+      end_offset_days: 0,
+      template_id: template.id,
+      assigned_group_id: marketing.id
+    },
+    authorize?: false
+  )
 
 t3_1 =
-  Ash.create!(TemplateTask, %{title: "Eröffnungskampagne planen", level: 1, position: 1,
-    start_offset_days: -60, end_offset_days: -30, warning_offset_days: 5,
-    template_id: template.id, parent_id: kap3.id, assigned_group_id: marketing.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Eröffnungskampagne planen",
+      level: 1,
+      position: 1,
+      start_offset_days: -60,
+      end_offset_days: -30,
+      warning_offset_days: 5,
+      template_id: template.id,
+      parent_id: kap3.id,
+      assigned_group_id: marketing.id
+    },
+    authorize?: false
+  )
 
 t3_2 =
-  Ash.create!(TemplateTask, %{title: "Flyer & Werbemittel drucken", level: 1, position: 2,
-    start_offset_days: -14, end_offset_days: -7, warning_offset_days: 3,
-    template_id: template.id, parent_id: kap3.id, assigned_group_id: marketing.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Flyer & Werbemittel drucken",
+      level: 1,
+      position: 2,
+      start_offset_days: -14,
+      end_offset_days: -7,
+      warning_offset_days: 3,
+      template_id: template.id,
+      parent_id: kap3.id,
+      assigned_group_id: marketing.id
+    },
+    authorize?: false
+  )
 
 t3_3 =
-  Ash.create!(TemplateTask, %{title: "Eröffnungsevent koordinieren", level: 1, position: 3,
-    start_offset_days: -7, end_offset_days: 0, warning_offset_days: 2,
-    template_id: template.id, parent_id: kap3.id, assigned_group_id: marketing.id}, authorize?: false)
+  Ash.create!(
+    TemplateTask,
+    %{
+      title: "Eröffnungsevent koordinieren",
+      level: 1,
+      position: 3,
+      start_offset_days: -7,
+      end_offset_days: 0,
+      warning_offset_days: 2,
+      template_id: template.id,
+      parent_id: kap3.id,
+      assigned_group_id: marketing.id
+    },
+    authorize?: false
+  )
 
 IO.puts("   TemplateTask-Kapitel: 3, Tasks: 9")
 
 # --- Abhängigkeiten ---
 deps = [
-  {t1_1, t1_2},  # Bauplan → Baugenehmigung
-  {t1_2, t1_3},  # Baugenehmigung → Rohbau
-  {t1_3, t2_1},  # Rohbau → Regale
-  {t2_1, t2_2},  # Regale → Kassen
-  {t2_2, t2_3},  # Kassen → Warenbestand
-  {t3_1, t3_2},  # Kampagne → Flyer
-  {t3_2, t3_3}   # Flyer → Event
+  # Bauplan → Baugenehmigung
+  {t1_1, t1_2},
+  # Baugenehmigung → Rohbau
+  {t1_2, t1_3},
+  # Rohbau → Regale
+  {t1_3, t2_1},
+  # Regale → Kassen
+  {t2_1, t2_2},
+  # Kassen → Warenbestand
+  {t2_2, t2_3},
+  # Kampagne → Flyer
+  {t3_1, t3_2},
+  # Flyer → Event
+  {t3_2, t3_3}
 ]
 
 Enum.each(deps, fn {pred, succ} ->
-  Ash.create!(TemplateTaskDependency,
+  Ash.create!(
+    TemplateTaskDependency,
     %{predecessor_id: pred.id, successor_id: succ.id, type: :finish_to_start, lag_days: 0},
-    authorize?: false)
+    authorize?: false
+  )
 end)
 
 IO.puts("   Abhängigkeiten: #{length(deps)}")
@@ -165,13 +314,17 @@ IO.puts("   Template Status: active")
 # ---------------------------------------------------------------------------
 
 context =
-  Ash.create!(Context, %{
-    name: "Markt Hamburg-Nord",
-    code: "HH-001",
-    type: :market,
-    external_id: "HH001",
-    metadata: %{"adresse" => "Musterstraße 42, 20099 Hamburg", "region" => "Nord"}
-  }, authorize?: false)
+  Ash.create!(
+    Context,
+    %{
+      name: "Markt Hamburg-Nord",
+      code: "HH-001",
+      type: :market,
+      external_id: "HH001",
+      metadata: %{"adresse" => "Musterstraße 42, 20099 Hamburg", "region" => "Nord"}
+    },
+    authorize?: false
+  )
 
 IO.puts("   Kontext: #{context.name}")
 
@@ -183,12 +336,16 @@ eröffnungsdatum = Date.add(Date.utc_today(), 60)
 
 project =
   Project
-  |> Ash.Changeset.for_create(:activate, %{
-    template_id: template.id,
-    context_id: context.id,
-    reference_date: eröffnungsdatum,
-    name: "Neueröffnung #{context.name}"
-  }, authorize?: false)
+  |> Ash.Changeset.for_create(
+    :activate,
+    %{
+      template_id: template.id,
+      context_id: context.id,
+      reference_date: eröffnungsdatum,
+      name: "Neueröffnung #{context.name}"
+    },
+    authorize?: false
+  )
   |> Ash.create!()
 
 IO.puts("   Projekt: #{project.name} (Eröffnung: #{eröffnungsdatum})")
@@ -206,7 +363,9 @@ require Ash.Query
   |> Ash.read(authorize?: false)
 
 case Enum.find(project_tasks, &(&1.status == :open)) do
-  nil -> :ok
+  nil ->
+    :ok
+
   task ->
     Ash.update!(task, %{}, action: :complete, authorize?: false)
     IO.puts("   '#{task.title}' → done (Propagierung getriggert)")

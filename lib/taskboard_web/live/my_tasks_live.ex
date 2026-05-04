@@ -39,7 +39,7 @@ defmodule TaskboardWeb.MyTasksLive do
             Alle offenen Aufgaben in deinen Gruppen
           </p>
         </div>
-        <div class="badge badge-neutral"><%= length(@tasks) %> Aufgaben gesamt</div>
+        <div class="badge badge-neutral">{length(@tasks)} Aufgaben gesamt</div>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-4 mb-6">
@@ -103,30 +103,38 @@ defmodule TaskboardWeb.MyTasksLive do
               ]}
             >
               <td>
-                <span :if={task.overdue?} class="badge badge-error badge-sm" title="Überfällig">!</span>
-                <span :if={!task.overdue? && task.warning?} class="badge badge-warning badge-sm" title="Warnung">~</span>
+                <span :if={task.overdue?} class="badge badge-error badge-sm" title="Überfällig">
+                  !
+                </span>
+                <span
+                  :if={!task.overdue? && task.warning?}
+                  class="badge badge-warning badge-sm"
+                  title="Warnung"
+                >
+                  ~
+                </span>
               </td>
               <td>
-                <div class="font-medium"><%= task.title %></div>
+                <div class="font-medium">{task.title}</div>
                 <div :if={task.chapter_number} class="text-xs text-base-content/50">
-                  <%= task.chapter_number %>
+                  {task.chapter_number}
                 </div>
               </td>
               <td class="text-sm text-base-content/70">
-                <%= task.project && task.project.name || "–" %>
+                {(task.project && task.project.name) || "–"}
               </td>
               <td>
                 <span :if={task.assigned_group} class="badge badge-ghost badge-sm">
-                  <%= task.assigned_group.name %>
+                  {task.assigned_group.name}
                 </span>
               </td>
               <td>
                 <span class={["badge badge-sm", status_badge_class(task.status)]}>
-                  <%= status_label(task.status) %>
+                  {status_label(task.status)}
                 </span>
               </td>
               <td class="text-sm">
-                <%= format_date(task.end_date) %>
+                {format_date(task.end_date)}
               </td>
             </tr>
           </tbody>

@@ -97,7 +97,12 @@ defmodule Taskboard.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ash.setup", "assets.setup", "assets.build"],
-      "ash.setup": ["ash.codegen initial_setup", "ecto.create", "ash.migrate", "run priv/repo/seeds.exs"],
+      "ash.setup": [
+        "ash.codegen initial_setup",
+        "ecto.create",
+        "ash.migrate",
+        "run priv/repo/seeds.exs"
+      ],
       "ecto.reset": ["ecto.drop", "ash.setup"],
       test: ["ecto.create --quiet", "ash.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],

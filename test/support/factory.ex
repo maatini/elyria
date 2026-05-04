@@ -12,7 +12,10 @@ defmodule Taskboard.Factory do
   def create_chapter(template, attrs \\ %{}) do
     Ash.create!(
       Taskboard.Templates.TemplateTask,
-      Map.merge(%{template_id: template.id, title: "Kapitel", level: 0, position: 1}, Map.new(attrs)),
+      Map.merge(
+        %{template_id: template.id, title: "Kapitel", level: 0, position: 1},
+        Map.new(attrs)
+      ),
       authorize?: false
     )
   end

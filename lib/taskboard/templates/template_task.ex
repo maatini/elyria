@@ -4,36 +4,40 @@ defmodule Taskboard.Templates.TemplateTask do
     data_layer: AshPostgres.DataLayer
 
   postgres do
-    table "template_tasks"
-    repo Taskboard.Repo
+    table("template_tasks")
+    repo(Taskboard.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
-    attribute :title, :string, allow_nil?: false, public?: true
-    attribute :description, :string, public?: true
+    attribute(:title, :string, allow_nil?: false, public?: true)
+    attribute(:description, :string, public?: true)
 
     # Hierarchy: 0 = chapter/section, 1 = task
-    attribute :level, :integer, default: 0, allow_nil?: false, public?: true
+    attribute(:level, :integer, default: 0, allow_nil?: false, public?: true)
     # Position within parent (1-indexed)
-    attribute :position, :integer, default: 1, allow_nil?: false, public?: true
+    attribute(:position, :integer, default: 1, allow_nil?: false, public?: true)
 
     # Relative time offsets to template reference date (days)
     # Negative = before reference date, positive = after
-    attribute :start_offset_days, :integer, default: 0, public?: true
-    attribute :end_offset_days, :integer, default: 7, public?: true
+    attribute(:start_offset_days, :integer, default: 0, public?: true)
+    attribute(:end_offset_days, :integer, default: 7, public?: true)
     # Days before end_date to show warning (nil = no warning)
-    attribute :warning_offset_days, :integer, allow_nil?: true, public?: true
+    attribute(:warning_offset_days, :integer, allow_nil?: true, public?: true)
 
     # JSONB blob for custom field default values: %{"field_name" => value}
-    attribute :custom_field_defaults, :map, default: %{}, public?: true
+    attribute(:custom_field_defaults, :map, default: %{}, public?: true)
 
     timestamps()
   end
 
   calculations do
-    calculate :chapter_number, :string, Taskboard.Templates.TemplateTask.Calculations.ChapterNumber
+    calculate(
+      :chapter_number,
+      :string,
+      Taskboard.Templates.TemplateTask.Calculations.ChapterNumber
+    )
   end
 
   relationships do
@@ -51,35 +55,50 @@ defmodule Taskboard.Templates.TemplateTask do
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults([:read, :destroy])
 
     create :create do
-      primary? true
-      accept [
-        :title, :description, :level, :position,
-        :start_offset_days, :end_offset_days, :warning_offset_days,
-        :custom_field_defaults, :template_id, :parent_id, :assigned_group_id
-      ]
+      primary?(true)
 
-      change Taskboard.Templates.TemplateTask.Changes.EnsureValidLevel
+      accept([
+        :title,
+        :description,
+        :level,
+        :position,
+        :start_offset_days,
+        :end_offset_days,
+        :warning_offset_days,
+        :custom_field_defaults,
+        :template_id,
+        :parent_id,
+        :assigned_group_id
+      ])
+
+      change(Taskboard.Templates.TemplateTask.Changes.EnsureValidLevel)
     end
 
     update :update do
-      accept [
-        :title, :description, :position,
-        :start_offset_days, :end_offset_days, :warning_offset_days,
-        :custom_field_defaults, :assigned_group_id
-      ]
-      require_atomic? false
+      accept([
+        :title,
+        :description,
+        :position,
+        :start_offset_days,
+        :end_offset_days,
+        :warning_offset_days,
+        :custom_field_defaults,
+        :assigned_group_id
+      ])
+
+      require_atomic?(false)
     end
 
     update :reorder do
-      accept [:position]
-      require_atomic? false
+      accept([:position])
+      require_atomic?(false)
     end
   end
 
   identities do
-    identity :unique_position, [:template_id, :parent_id, :position]
+    identity(:unique_position, [:template_id, :parent_id, :position])
   end
 end
