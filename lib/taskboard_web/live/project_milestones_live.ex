@@ -453,7 +453,11 @@ defmodule TaskboardWeb.ProjectMilestonesLive do
 
   defp load_tasks(project_id, actor) do
     Taskboard.Projects.ProjectTask
-    |> Ash.Query.filter(project_id == ^project_id and is_nil(parent_id))
+    |> Ash.Query.filter(
+      project_id == ^project_id and
+        level == 1 and
+        task_type in [:regular, :main]
+    )
     |> Ash.Query.sort(position: :asc)
     |> Ash.read!(actor: actor, authorize?: false)
   rescue

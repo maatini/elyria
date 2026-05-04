@@ -30,6 +30,14 @@ defmodule Taskboard.Templates.TemplateTask do
     # JSONB blob for custom field default values: %{"field_name" => value}
     attribute(:custom_field_defaults, :map, default: %{}, public?: true)
 
+    # :regular = normaler Task, :main = Haupt-Task mit Detail-Tasks, :detail = Detail-Task
+    attribute(:task_type, :atom,
+      constraints: [one_of: [:regular, :main, :detail]],
+      default: :regular,
+      allow_nil?: false,
+      public?: true
+    )
+
     timestamps()
   end
 
@@ -67,6 +75,7 @@ defmodule Taskboard.Templates.TemplateTask do
         :description,
         :level,
         :position,
+        :task_type,
         :start_offset_days,
         :end_offset_days,
         :warning_offset_days,
@@ -85,6 +94,7 @@ defmodule Taskboard.Templates.TemplateTask do
         :title,
         :description,
         :position,
+        :task_type,
         :start_offset_days,
         :end_offset_days,
         :warning_offset_days,

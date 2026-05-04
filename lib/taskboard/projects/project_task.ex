@@ -44,6 +44,14 @@ defmodule Taskboard.Projects.ProjectTask do
     attribute(:custom_field_values, :map, default: %{}, public?: true)
     attribute(:notes, :string, public?: true)
 
+    # :regular = normaler Task, :main = Haupt-Task mit Detail-Tasks, :detail = Detail-Task ohne Daten
+    attribute(:task_type, :atom,
+      constraints: [one_of: [:regular, :main, :detail]],
+      default: :regular,
+      allow_nil?: false,
+      public?: true
+    )
+
     timestamps()
   end
 
@@ -82,6 +90,7 @@ defmodule Taskboard.Projects.ProjectTask do
         :description,
         :level,
         :position,
+        :task_type,
         :status,
         :start_date,
         :end_date,
@@ -94,6 +103,19 @@ defmodule Taskboard.Projects.ProjectTask do
         :assigned_group_id,
         :milestone_id
       ])
+
+      validate(fn changeset, _ctx ->
+        task_type = Ash.Changeset.get_attribute(changeset, :task_type)
+        milestone_id = Ash.Changeset.get_attribute(changeset, :milestone_id)
+
+        if task_type == :detail and not is_nil(milestone_id) do
+          {:error,
+           field: :milestone_id,
+           message: "Detail-Tasks können keinem Meilenstein zugeordnet werden"}
+        else
+          :ok
+        end
+      end)
     end
 
     update :update do
@@ -116,6 +138,7 @@ defmodule Taskboard.Projects.ProjectTask do
       require_atomic?(false)
       change(set_attribute(:completed_at, &DateTime.utc_now/0))
       change({AshStateMachine.BuiltinChanges.TransitionState, target: :done})
+      change(Taskboard.Projects.ProjectTask.Changes.CascadeCompleteDetailTasks)
     end
 
     update :unblock do
@@ -140,6 +163,7 @@ defmodule Taskboard.Projects.ProjectTask do
       accept([])
       require_atomic?(false)
       change({AshStateMachine.BuiltinChanges.TransitionState, target: :open})
+      change(Taskboard.Projects.ProjectTask.Changes.AutoReopenMainTask)
     end
 
     update :block do
@@ -169,6 +193,10 @@ defmodule Taskboard.Projects.ProjectTask do
   # Propagate status to successor tasks after status transitions to :done or :skipped
   changes do
     change(Taskboard.Projects.ProjectTask.Changes.PropagateStatusToSuccessors,
+      on: [:update]
+    )
+
+    change(Taskboard.Projects.ProjectTask.Changes.SyncMainTaskStatus,
       on: [:update]
     )
   end

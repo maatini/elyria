@@ -114,7 +114,22 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
               authorize?: false
             )
 
-          Map.put(child_acc, child.id, child_pt.id)
+          child_acc = Map.put(child_acc, child.id, child_pt.id)
+
+          child.id
+          |> children_of(all_tasks)
+          |> Enum.reduce(child_acc, fn detail, detail_acc ->
+            detail_status = initial_status(detail.id, tasks_with_incoming_deps)
+
+            {:ok, detail_pt} =
+              Ash.create(
+                Taskboard.Projects.ProjectTask,
+                task_attrs(detail, project.id, child_pt.id, reference_date, detail_status, milestone_id_map),
+                authorize?: false
+              )
+
+            Map.put(detail_acc, detail.id, detail_pt.id)
+          end)
         end)
       end)
 
@@ -146,23 +161,27 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
   end
 
   defp task_attrs(task, project_id, parent_id, reference_date, status, milestone_id_map) do
-    start_date = Date.add(reference_date, task.start_offset_days || 0)
-    end_date = Date.add(reference_date, task.end_offset_days || 7)
-
-    warning_date =
-      case task.warning_offset_days do
-        nil -> nil
-        days -> Date.add(end_date, -days)
+    {start_date, end_date, warning_date} =
+      if task.task_type == :detail do
+        {nil, nil, nil}
+      else
+        s = Date.add(reference_date, task.start_offset_days || 0)
+        e = Date.add(reference_date, task.end_offset_days || 7)
+        w = task.warning_offset_days && Date.add(e, -task.warning_offset_days)
+        {s, e, w}
       end
 
     milestone_id =
-      task.template_milestone_id && Map.get(milestone_id_map, task.template_milestone_id)
+      task.task_type != :detail &&
+        task.template_milestone_id &&
+        Map.get(milestone_id_map, task.template_milestone_id)
 
     %{
       title: task.title,
       description: task.description,
       level: task.level,
       position: task.position,
+      task_type: task.task_type,
       start_date: start_date,
       end_date: end_date,
       warning_date: warning_date,
@@ -172,7 +191,7 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
       parent_id: parent_id,
       assigned_group_id: task.assigned_group_id,
       custom_field_values: task.custom_field_defaults || %{},
-      milestone_id: milestone_id
+      milestone_id: milestone_id || nil
     }
   end
 end
