@@ -87,13 +87,19 @@ defmodule TaskboardWeb.MyTasksLive do
         </div>
       </div>
 
-      <div :if={@filtered_tasks == []} class="flex flex-col items-center justify-center py-20 text-center">
+      <div
+        :if={@filtered_tasks == []}
+        class="flex flex-col items-center justify-center py-20 text-center"
+      >
         <div class="size-16 rounded-full bg-base-300 flex items-center justify-center mb-4">
           <.icon name="hero-clipboard-document-check" class="size-8 text-base-content/30" />
         </div>
         <h3 class="text-lg font-semibold text-base-content/60">Keine Aufgaben gefunden</h3>
         <p class="text-sm text-base-content/40 mt-1">
-          {if(@search != "", do: "Versuche einen anderen Suchbegriff.", else: "Du hast aktuell keine offenen Aufgaben.")}
+          {if(@search != "",
+            do: "Versuche einen anderen Suchbegriff.",
+            else: "Du hast aktuell keine offenen Aufgaben."
+          )}
         </p>
       </div>
 

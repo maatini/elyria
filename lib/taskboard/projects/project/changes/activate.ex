@@ -57,7 +57,13 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
     end
   end
 
-  defp create_tasks_deps_and_milestones(project, all_tasks, all_deps, template_milestones, reference_date) do
+  defp create_tasks_deps_and_milestones(
+         project,
+         all_tasks,
+         all_deps,
+         template_milestones,
+         reference_date
+       ) do
     # 1. Create Milestones and build template_milestone_id → milestone_id map
     milestone_id_map =
       Enum.reduce(template_milestones, %{}, fn tm, acc ->
@@ -91,46 +97,15 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
 
     task_id_map =
       Enum.reduce(root_tasks, %{}, fn task, acc ->
-        status = initial_status(task.id, tasks_with_incoming_deps)
-
-        {:ok, pt} =
-          Ash.create(
-            Taskboard.Projects.ProjectTask,
-            task_attrs(task, project.id, nil, reference_date, status, milestone_id_map),
-            authorize?: false
-          )
-
-        acc = Map.put(acc, task.id, pt.id)
-
-        task.id
-        |> children_of(all_tasks)
-        |> Enum.reduce(acc, fn child, child_acc ->
-          child_status = initial_status(child.id, tasks_with_incoming_deps)
-
-          {:ok, child_pt} =
-            Ash.create(
-              Taskboard.Projects.ProjectTask,
-              task_attrs(child, project.id, pt.id, reference_date, child_status, milestone_id_map),
-              authorize?: false
-            )
-
-          child_acc = Map.put(child_acc, child.id, child_pt.id)
-
-          child.id
-          |> children_of(all_tasks)
-          |> Enum.reduce(child_acc, fn detail, detail_acc ->
-            detail_status = initial_status(detail.id, tasks_with_incoming_deps)
-
-            {:ok, detail_pt} =
-              Ash.create(
-                Taskboard.Projects.ProjectTask,
-                task_attrs(detail, project.id, child_pt.id, reference_date, detail_status, milestone_id_map),
-                authorize?: false
-              )
-
-            Map.put(detail_acc, detail.id, detail_pt.id)
-          end)
-        end)
+        create_root_task(
+          task,
+          acc,
+          all_tasks,
+          project,
+          reference_date,
+          milestone_id_map,
+          tasks_with_incoming_deps
+        )
       end)
 
     # 3. Create dependencies
@@ -148,6 +123,103 @@ defmodule Taskboard.Projects.Project.Changes.Activate do
     end)
 
     {:ok, project}
+  end
+
+  defp create_root_task(task, acc, all_tasks, project, reference_date, milestone_id_map, deps_set) do
+    status = initial_status(task.id, deps_set)
+
+    {:ok, pt} =
+      Ash.create(
+        Taskboard.Projects.ProjectTask,
+        task_attrs(task, project.id, nil, reference_date, status, milestone_id_map),
+        authorize?: false
+      )
+
+    acc = Map.put(acc, task.id, pt.id)
+
+    children_of(task.id, all_tasks)
+    |> Enum.reduce(acc, fn child, child_acc ->
+      create_child_task(
+        child,
+        child_acc,
+        pt.id,
+        all_tasks,
+        project,
+        reference_date,
+        milestone_id_map,
+        deps_set
+      )
+    end)
+  end
+
+  defp create_child_task(
+         child,
+         acc,
+         parent_pt_id,
+         all_tasks,
+         project,
+         reference_date,
+         milestone_id_map,
+         deps_set
+       ) do
+    child_status = initial_status(child.id, deps_set)
+
+    {:ok, child_pt} =
+      Ash.create(
+        Taskboard.Projects.ProjectTask,
+        task_attrs(
+          child,
+          project.id,
+          parent_pt_id,
+          reference_date,
+          child_status,
+          milestone_id_map
+        ),
+        authorize?: false
+      )
+
+    acc = Map.put(acc, child.id, child_pt.id)
+
+    children_of(child.id, all_tasks)
+    |> Enum.reduce(acc, fn detail, detail_acc ->
+      create_detail_task(
+        detail,
+        detail_acc,
+        child_pt.id,
+        project,
+        reference_date,
+        milestone_id_map,
+        deps_set
+      )
+    end)
+  end
+
+  defp create_detail_task(
+         detail,
+         acc,
+         parent_pt_id,
+         project,
+         reference_date,
+         milestone_id_map,
+         deps_set
+       ) do
+    detail_status = initial_status(detail.id, deps_set)
+
+    {:ok, detail_pt} =
+      Ash.create(
+        Taskboard.Projects.ProjectTask,
+        task_attrs(
+          detail,
+          project.id,
+          parent_pt_id,
+          reference_date,
+          detail_status,
+          milestone_id_map
+        ),
+        authorize?: false
+      )
+
+    Map.put(acc, detail.id, detail_pt.id)
   end
 
   defp initial_status(task_id, tasks_with_incoming_deps) do

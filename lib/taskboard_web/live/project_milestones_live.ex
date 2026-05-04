@@ -203,8 +203,7 @@ defmodule TaskboardWeb.ProjectMilestonesLive do
           </p>
         </div>
         <button class="btn btn-primary gap-2" phx-click="open_create">
-          <.icon name="hero-plus" class="size-4" />
-          Neuer Meilenstein
+          <.icon name="hero-plus" class="size-4" /> Neuer Meilenstein
         </button>
       </div>
     </div>
@@ -234,7 +233,10 @@ defmodule TaskboardWeb.ProjectMilestonesLive do
             <%!-- Header --%>
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-start gap-3 flex-1 min-w-0">
-                <div class={["size-10 rounded-lg flex items-center justify-center shrink-0", milestone_icon_bg(milestone)]}>
+                <div class={[
+                  "size-10 rounded-lg flex items-center justify-center shrink-0",
+                  milestone_icon_bg(milestone)
+                ]}>
                   <.icon name="hero-flag" class={["size-5", milestone_icon_color(milestone)]} />
                 </div>
                 <div class="flex-1 min-w-0">

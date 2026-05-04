@@ -82,8 +82,7 @@ defmodule TaskboardWeb.Layouts do
                     )
                   ]}
                 >
-                  <.icon name="hero-squares-2x2" class="size-5 shrink-0" />
-                  Dashboard
+                  <.icon name="hero-squares-2x2" class="size-5 shrink-0" /> Dashboard
                 </.link>
               </li>
               <li>
@@ -116,8 +115,7 @@ defmodule TaskboardWeb.Layouts do
                     )
                   ]}
                 >
-                  <.icon name="hero-folder-open" class="size-5 shrink-0" />
-                  Projekte
+                  <.icon name="hero-folder-open" class="size-5 shrink-0" /> Projekte
                 </.link>
               </li>
               <li>
@@ -131,8 +129,7 @@ defmodule TaskboardWeb.Layouts do
                     )
                   ]}
                 >
-                  <.icon name="hero-document-duplicate" class="size-5 shrink-0" />
-                  Vorlagen
+                  <.icon name="hero-document-duplicate" class="size-5 shrink-0" /> Vorlagen
                 </.link>
               </li>
             </ul>

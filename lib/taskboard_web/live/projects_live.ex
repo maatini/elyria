@@ -50,7 +50,10 @@ defmodule TaskboardWeb.ProjectsLive do
 
           <div class="card-body p-5">
             <div class="flex items-start gap-3 mb-3">
-              <div class={["size-10 rounded-lg flex items-center justify-center shrink-0", status_icon_bg(project.status)]}>
+              <div class={[
+                "size-10 rounded-lg flex items-center justify-center shrink-0",
+                status_icon_bg(project.status)
+              ]}>
                 <.icon name="hero-folder-open" class={["size-5", status_icon_color(project.status)]} />
               </div>
               <div class="flex-1 min-w-0">
@@ -76,15 +79,13 @@ defmodule TaskboardWeb.ProjectsLive do
                 navigate={~p"/projects/#{project.id}/gantt"}
                 class="btn btn-primary btn-sm gap-1.5 flex-1"
               >
-                <.icon name="hero-chart-bar" class="size-4" />
-                Gantt
+                <.icon name="hero-chart-bar" class="size-4" /> Gantt
               </.link>
               <.link
                 navigate={~p"/projects/#{project.id}/milestones"}
                 class="btn btn-ghost btn-sm gap-1.5"
               >
-                <.icon name="hero-flag" class="size-4" />
-                Meilensteine
+                <.icon name="hero-flag" class="size-4" /> Meilensteine
               </.link>
             </div>
           </div>

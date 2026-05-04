@@ -124,7 +124,10 @@ defmodule TaskboardWeb.DashboardLive do
         <div
           class={[
             "card border hover:shadow-md transition-shadow cursor-pointer",
-            if(@stats.overdue > 0, do: "bg-error/10 border-error/30", else: "bg-base-200 border-base-300")
+            if(@stats.overdue > 0,
+              do: "bg-error/10 border-error/30",
+              else: "bg-base-200 border-base-300"
+            )
           ]}
           phx-click={@stats.overdue > 0 && JS.dispatch("click", to: "#critical-tasks-dialog")}
         >
@@ -138,12 +141,17 @@ defmodule TaskboardWeb.DashboardLive do
                 if(@stats.overdue > 0, do: "bg-error/20", else: "bg-success/15")
               ]}>
                 <.icon
-                  name={if(@stats.overdue > 0, do: "hero-exclamation-triangle", else: "hero-check-circle")}
+                  name={
+                    if(@stats.overdue > 0, do: "hero-exclamation-triangle", else: "hero-check-circle")
+                  }
                   class={["size-4", if(@stats.overdue > 0, do: "text-error", else: "text-success")]}
                 />
               </div>
             </div>
-            <div class={["text-3xl font-bold", if(@stats.overdue > 0, do: "text-error", else: "text-success")]}>
+            <div class={[
+              "text-3xl font-bold",
+              if(@stats.overdue > 0, do: "text-error", else: "text-success")
+            ]}>
               {@stats.overdue}
             </div>
             <div class="text-xs text-base-content/50 mt-1">
@@ -182,15 +190,13 @@ defmodule TaskboardWeb.DashboardLive do
           </div>
         </div>
 
-        <div
-          class={[
-            "card border hover:shadow-md transition-shadow",
-            if(length(@critical_milestones) > 0,
-              do: "bg-warning/10 border-warning/30",
-              else: "bg-base-200 border-base-300"
-            )
-          ]}
-        >
+        <div class={[
+          "card border hover:shadow-md transition-shadow",
+          if(length(@critical_milestones) > 0,
+            do: "bg-warning/10 border-warning/30",
+            else: "bg-base-200 border-base-300"
+          )
+        ]}>
           <div class="card-body p-4">
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
@@ -204,7 +210,10 @@ defmodule TaskboardWeb.DashboardLive do
                   name="hero-flag"
                   class={[
                     "size-4",
-                    if(length(@critical_milestones) > 0, do: "text-warning", else: "text-base-content/40")
+                    if(length(@critical_milestones) > 0,
+                      do: "text-warning",
+                      else: "text-base-content/40"
+                    )
                   ]}
                 />
               </div>
@@ -216,7 +225,10 @@ defmodule TaskboardWeb.DashboardLive do
               {length(@critical_milestones)}
             </div>
             <div class="text-xs text-base-content/50 mt-1">
-              {if(length(@critical_milestones) > 0, do: "mit Warnung / überfällig", else: "alles im Plan")}
+              {if(length(@critical_milestones) > 0,
+                do: "mit Warnung / überfällig",
+                else: "alles im Plan"
+              )}
             </div>
           </div>
         </div>
@@ -306,7 +318,10 @@ defmodule TaskboardWeb.DashboardLive do
               Aktionen
             </h2>
 
-            <div :if={@critical_tasks != []} class="alert bg-warning/15 border border-warning/30 mb-2 p-3">
+            <div
+              :if={@critical_tasks != []}
+              class="alert bg-warning/15 border border-warning/30 mb-2 p-3"
+            >
               <.icon name="hero-exclamation-triangle" class="size-5 text-warning shrink-0" />
               <div class="text-sm">
                 <div class="font-medium">{length(@critical_tasks)} kritische Aufgaben</div>
