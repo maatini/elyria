@@ -1,0 +1,51 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.7/.schema/devbox.schema.json",
+  "packages": [
+    "elixir@1.17",
+    "postgresql@16",
+    "nodejs@22"
+  ],
+  "env": {
+    "ERL_AFLAGS": "-kernel shell_history enabled",
+    "PGDATA": "$PWD/.devbox/postgresql/data",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "5432",
+    "MIX_HOME": "$PWD/.mix",
+    "HEX_HOME": "$PWD/.hex"
+  },
+  "shell": {
+    "init_hook": [
+      "export PATH=$MIX_HOME/escripts:$PATH"
+    ],
+    "scripts": {
+      "db:init": [
+        "[ -d $PGDATA ] && echo 'PostgreSQL already initialized' && exit 0",
+        "initdb -D $PGDATA --auth=trust --username=postgres",
+        "echo 'host all all 127.0.0.1/32 trust' >> $PGDATA/pg_hba.conf",
+        "echo 'listen_addresses = 127.0.0.1' >> $PGDATA/postgresql.conf"
+      ],
+      "db:start": [
+        "pg_ctl start -D $PGDATA -l $PGDATA/postgresql.log -o '--unix_socket_directories='",
+        "sleep 1"
+      ],
+      "db:stop": "pg_ctl stop -D $PGDATA",
+      "db:status": "pg_ctl status -D $PGDATA",
+      "setup": [
+        "devbox run db:init",
+        "devbox run db:start",
+        "mix local.hex --force",
+        "mix local.rebar --force",
+        "mix deps.get",
+        "mix ash.setup"
+      ],
+      "server": [
+        "devbox run db:start",
+        "mix phx.server"
+      ],
+      "reset": [
+        "devbox run db:start",
+        "mix ecto.reset"
+      ]
+    }
+  }
+}
