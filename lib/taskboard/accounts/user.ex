@@ -9,7 +9,7 @@ defmodule Taskboard.Accounts.User do
       enabled? true
       token_resource Taskboard.Accounts.Token
       signing_secret Taskboard.Accounts.Secrets
-      require_token_presence_for_authentication? true
+      require_token_presence_for_authentication? false
     end
 
     strategies do

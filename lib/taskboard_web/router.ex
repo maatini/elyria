@@ -27,7 +27,7 @@ defmodule TaskboardWeb.Router do
 
     get "/", PageController, :home
 
-    sign_in_route register_path: "/register", reset_path: "/reset"
+    sign_in_route register_path: "/register", reset_path: "/reset", auth_routes_prefix: "/auth"
     sign_out_route AuthController
     auth_routes AuthController, Taskboard.Accounts.User, path: "/auth"
     reset_route []
