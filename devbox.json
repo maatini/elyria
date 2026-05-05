@@ -26,8 +26,7 @@
         "echo \"listen_addresses = '127.0.0.1'\" >> $PGDATA/postgresql.conf"
       ],
       "db:start": [
-        "pg_ctl start -D $PGDATA -l $PGDATA/postgresql.log -o '--unix_socket_directories='",
-        "sleep 1"
+        "pg_ctl status -D $PGDATA > /dev/null 2>&1 && echo 'PostgreSQL already running' || (pg_ctl start -D $PGDATA -l $PGDATA/postgresql.log -o '--unix_socket_directories=' && sleep 1)"
       ],
       "db:stop": "pg_ctl stop -D $PGDATA",
       "db:status": "pg_ctl status -D $PGDATA",
