@@ -3,7 +3,8 @@
   "packages": [
     "elixir@1.17",
     "postgresql@16",
-    "nodejs@22"
+    "nodejs@22",
+    "lefthook@2.1.5"
   ],
   "env": {
     "ERL_AFLAGS": "-kernel shell_history enabled",
@@ -36,7 +37,8 @@
         "mix local.hex --force",
         "mix local.rebar --force",
         "mix deps.get",
-        "mix ash.setup"
+        "mix ash.setup",
+        "lefthook install"
       ],
       "server": [
         "devbox run db:start",

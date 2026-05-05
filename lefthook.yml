@@ -1,0 +1,8 @@
+pre-commit:
+  commands:
+    format:
+      run: mix format --check-formatted
+      fail_text: "Formatting fehlt – bitte `mix format` ausführen und erneut committen"
+    credo:
+      run: mix credo --strict
+      fail_text: "Credo-Fehler gefunden – bitte beheben und erneut committen"
