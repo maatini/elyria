@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.7/.schema/devbox.schema.json",
   "packages": [
-    "elixir@1.17",
+    "elixir@1.18",
     "postgresql@16",
     "nodejs@22",
     "lefthook@2.1.5"
@@ -10,7 +10,7 @@
     "ERL_AFLAGS": "-kernel shell_history enabled",
     "PGDATA": "$PWD/.devbox/postgresql/data",
     "PGHOST": "127.0.0.1",
-    "PGPORT": "5432",
+    "PGPORT": "5433",
     "MIX_HOME": "$PWD/.mix",
     "HEX_HOME": "$PWD/.hex"
   },
@@ -23,7 +23,7 @@
         "[ -d $PGDATA ] && echo 'PostgreSQL already initialized' && exit 0",
         "initdb -D $PGDATA --auth=trust --username=postgres",
         "echo 'host all all 127.0.0.1/32 trust' >> $PGDATA/pg_hba.conf",
-        "echo 'listen_addresses = 127.0.0.1' >> $PGDATA/postgresql.conf"
+        "echo \"listen_addresses = '127.0.0.1'\" >> $PGDATA/postgresql.conf"
       ],
       "db:start": [
         "pg_ctl start -D $PGDATA -l $PGDATA/postgresql.log -o '--unix_socket_directories='",
