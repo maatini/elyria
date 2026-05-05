@@ -11,7 +11,7 @@ defmodule Taskboard.Accounts.User do
       token_resource(Taskboard.Accounts.Token)
       signing_secret(Taskboard.Accounts.Secrets)
       require_token_presence_for_authentication?(false)
-      session_identifier(:jti)
+      session_identifier(:unsafe)
     end
 
     strategies do

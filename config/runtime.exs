@@ -20,6 +20,9 @@ if System.get_env("PHX_SERVER") do
   config :taskboard, TaskboardWeb.Endpoint, server: true
 end
 
+config :taskboard,
+  upload_root: System.get_env("UPLOAD_ROOT", Application.app_dir(:taskboard, "priv/uploads"))
+
 config :taskboard, TaskboardWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 

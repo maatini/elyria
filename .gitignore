@@ -22,6 +22,9 @@ erl_crash.dump
 # Temporary files, for example, from tests.
 /tmp/
 
+# User uploads
+/priv/uploads/
+
 # Ignore package tarball (built via "mix hex.build").
 taskboard-*.tar
 
@@ -35,3 +38,17 @@ taskboard-*.tar
 npm-debug.log
 /assets/node_modules/
 .DS_Store
+
+# Devbox
+devbox.lock
+.devbox/
+
+# Hex and Mix local caches
+/.hex/
+/.mix/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo

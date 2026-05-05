@@ -19,7 +19,8 @@ defmodule TaskboardWeb.ProjectGanttLive do
          |> assign(:tasks, tasks)
          |> assign(:gantt_tasks_json, Jason.encode!(gantt_tasks))
          |> assign(:view_mode, "Week")
-         |> assign(:view_modes, @view_modes)}
+         |> assign(:view_modes, @view_modes)
+         |> assign(:selected_task, nil)}
 
       {:error, _} ->
         {:ok,
@@ -69,8 +70,14 @@ defmodule TaskboardWeb.ProjectGanttLive do
   end
 
   @impl true
-  def handle_event("gantt-task-click", %{"task_id" => _task_id}, socket) do
-    {:noreply, socket}
+  def handle_event("gantt-task-click", %{"task_id" => task_id}, socket) do
+    task = Enum.find(socket.assigns.tasks, &(&1.id == task_id))
+    {:noreply, assign(socket, :selected_task, task)}
+  end
+
+  @impl true
+  def handle_event("close_task_modal", _params, socket) do
+    {:noreply, assign(socket, :selected_task, nil)}
   end
 
   @impl true
@@ -82,6 +89,14 @@ defmodule TaskboardWeb.ProjectGanttLive do
           ← Projekte
         </.link>
         <h1 class="text-xl font-bold flex-1">{@project.name}</h1>
+
+        <.link
+          navigate={~p"/projects/#{@project.id}"}
+          class="btn btn-ghost btn-sm gap-1.5"
+          title="Kommentare & Anhänge"
+        >
+          <.icon name="hero-chat-bubble-left-ellipsis" class="size-4" />
+        </.link>
 
         <div class="join">
           <button
@@ -108,6 +123,62 @@ defmodule TaskboardWeb.ProjectGanttLive do
         class="overflow-x-auto"
       >
         <div data-gantt-target class="w-full"></div>
+      </div>
+    </div>
+
+    <%!-- Task-Detail-Drawer --%>
+    <div
+      :if={@selected_task}
+      class="fixed inset-0 z-40 flex justify-end"
+      phx-click="close_task_modal"
+    >
+      <div class="fixed inset-0 bg-black/30" aria-hidden="true"></div>
+      <div
+        class="relative z-50 w-full max-w-lg bg-base-100 shadow-2xl flex flex-col h-full overflow-y-auto"
+        phx-click-away="close_task_modal"
+      >
+        <%!-- Drawer-Header --%>
+        <div class="flex items-start gap-3 p-5 border-b border-base-300 sticky top-0 bg-base-100">
+          <div class="flex-1 min-w-0">
+            <div class="text-xs text-base-content/40 mb-0.5">
+              {if @selected_task.chapter_number, do: @selected_task.chapter_number, else: "Aufgabe"}
+            </div>
+            <h2 class="font-semibold text-lg leading-snug">{@selected_task.title}</h2>
+            <div class="flex flex-wrap gap-1.5 mt-1.5">
+              <span class={["badge badge-sm", task_status_badge(@selected_task.status)]}>
+                {status_de(@selected_task.status)}
+              </span>
+              <span :if={@selected_task.assigned_group} class="badge badge-ghost badge-sm">
+                {@selected_task.assigned_group.name}
+              </span>
+            </div>
+          </div>
+          <button
+            class="btn btn-ghost btn-sm btn-circle"
+            phx-click="close_task_modal"
+          >
+            <.icon name="hero-x-mark" class="size-5" />
+          </button>
+        </div>
+
+        <%!-- Drawer-Body: Tabs --%>
+        <div class="flex-1 p-5 flex flex-col gap-6">
+          <.live_component
+            module={TaskboardWeb.CommentThreadComponent}
+            id={"comments-task-#{@selected_task.id}"}
+            parent_type={:project_task}
+            parent_id={@selected_task.id}
+            current_user={@current_user}
+          />
+          <div class="divider my-0"></div>
+          <.live_component
+            module={TaskboardWeb.AttachmentPanelComponent}
+            id={"attachments-task-#{@selected_task.id}"}
+            parent_type={:project_task}
+            parent_id={@selected_task.id}
+            current_user={@current_user}
+          />
+        </div>
       </div>
     </div>
     """
@@ -208,4 +279,11 @@ defmodule TaskboardWeb.ProjectGanttLive do
   defp status_de(:done), do: "Erledigt"
   defp status_de(:skipped), do: "Übersprungen"
   defp status_de(other), do: to_string(other)
+
+  defp task_status_badge(:open), do: "badge-ghost"
+  defp task_status_badge(:blocked), do: "badge-error"
+  defp task_status_badge(:in_progress), do: "badge-info"
+  defp task_status_badge(:done), do: "badge-success"
+  defp task_status_badge(:skipped), do: "badge-neutral"
+  defp task_status_badge(_), do: "badge-ghost"
 end

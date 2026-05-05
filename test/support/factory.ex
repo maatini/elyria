@@ -55,6 +55,22 @@ defmodule Taskboard.Factory do
     )
   end
 
+  def create_group(attrs \\ %{}) do
+    Ash.create!(
+      Taskboard.Accounts.Group,
+      Map.merge(%{name: "Test Group"}, Map.new(attrs)),
+      authorize?: false
+    )
+  end
+
+  def create_membership(group, user, attrs \\ %{}) do
+    Ash.create!(
+      Taskboard.Accounts.GroupMembership,
+      Map.merge(%{group_id: group.id, user_id: user.id}, Map.new(attrs)),
+      authorize?: false
+    )
+  end
+
   def activate_project(template, context, opts \\ %{}) do
     Taskboard.Projects.Project
     |> Ash.Changeset.for_create(

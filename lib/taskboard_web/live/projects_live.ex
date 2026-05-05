@@ -87,6 +87,13 @@ defmodule TaskboardWeb.ProjectsLive do
               >
                 <.icon name="hero-flag" class="size-4" /> Meilensteine
               </.link>
+              <.link
+                navigate={~p"/projects/#{project.id}"}
+                class="btn btn-ghost btn-sm gap-1.5"
+                title="Kommentare & Anhänge"
+              >
+                <.icon name="hero-chat-bubble-left-ellipsis" class="size-4" />
+              </.link>
             </div>
           </div>
         </div>

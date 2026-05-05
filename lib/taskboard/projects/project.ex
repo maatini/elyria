@@ -40,6 +40,8 @@ defmodule Taskboard.Projects.Project do
     belongs_to :project_type, Taskboard.Projects.ProjectType, allow_nil?: true
     belongs_to :template, Taskboard.Templates.Template, allow_nil?: true
     has_many :tasks, Taskboard.Projects.ProjectTask
+    has_many :attachments, Taskboard.Projects.Attachment
+    has_many :comments, Taskboard.Projects.Comment
   end
 
   actions do

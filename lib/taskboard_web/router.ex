@@ -36,14 +36,18 @@ defmodule TaskboardWeb.Router do
   scope "/", TaskboardWeb do
     pipe_through [:browser, :require_auth]
 
+    get "/attachments/:id/download", AttachmentController, :download
+
     ash_authentication_live_session :authenticated_routes,
       layout: {TaskboardWeb.Layouts, :app} do
       live "/dashboard", DashboardLive, :index
       live "/my-tasks", MyTasksLive, :index
       live "/projects", ProjectsLive, :index
+      live "/projects/:id", ProjectDetailLive, :index
       live "/projects/:id/gantt", ProjectGanttLive, :index
       live "/projects/:id/milestones", ProjectMilestonesLive, :index
       live "/templates", TemplatesLive, :index
+      live "/templates/:id", TemplateDetailLive, :index
     end
   end
 

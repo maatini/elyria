@@ -10,7 +10,8 @@ import Config
 config :taskboard,
   ecto_repos: [Taskboard.Repo],
   generators: [timestamp_type: :utc_datetime],
-  ash_domains: [Taskboard.Accounts, Taskboard.Templates, Taskboard.Projects]
+  ash_domains: [Taskboard.Accounts, Taskboard.Templates, Taskboard.Projects],
+  upload_max_bytes: 10 * 1024 * 1024
 
 config :taskboard, Oban,
   engine: Oban.Engines.Basic,

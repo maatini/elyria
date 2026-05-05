@@ -77,6 +77,9 @@ defmodule Taskboard.Projects.ProjectTask do
 
     has_many :incoming_dependencies, Taskboard.Projects.ProjectTaskDependency,
       destination_attribute: :successor_id
+
+    has_many :attachments, Taskboard.Projects.Attachment
+    has_many :comments, Taskboard.Projects.Comment
   end
 
   actions do
